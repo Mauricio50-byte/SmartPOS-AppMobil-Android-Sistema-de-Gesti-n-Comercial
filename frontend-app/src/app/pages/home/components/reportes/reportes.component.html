@@ -1,0 +1,175 @@
+<div class="reportes-container ion-padding">
+  
+  <!-- Header Actions -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 m-0">Reporte General</h2>
+    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+      <ion-button class="flex-1 sm:flex-none" fill="outline" (click)="refresh()" [disabled]="!dataLoaded">
+        <ion-icon slot="start" name="refresh-outline"></ion-icon>
+        <span class="hidden sm:inline">Actualizar</span>
+        <span class="inline sm:hidden">Refrescar</span>
+      </ion-button>
+      <ion-button class="flex-1 sm:flex-none" color="danger" (click)="exportPDF()" [disabled]="!dataLoaded">
+        <ion-icon slot="start" name="document-text-outline"></ion-icon>
+        PDF
+      </ion-button>
+      <ion-button class="flex-1 sm:flex-none" color="success" (click)="exportExcel()" [disabled]="!dataLoaded">
+        <ion-icon slot="start" name="grid-outline"></ion-icon>
+        Excel
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="!dataLoaded" class="flex justify-center items-center h-64">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <ng-container *ngIf="dataLoaded">
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <ion-card class="m-0 bg-white">
+        <ion-card-content>
+          <div class="text-sm text-gray-500 font-medium uppercase">Ventas Totales</div>
+          <div class="text-2xl font-bold text-gray-900 mt-1">{{ totalRevenue | currency }}</div>
+          <div class="text-xs text-green-600 mt-1 flex items-center">
+            <ion-icon name="trending-up-outline" class="mr-1"></ion-icon>
+            Ingresos brutos
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="m-0 bg-white">
+        <ion-card-content>
+          <div class="text-sm text-gray-500 font-medium uppercase">Volumen Ventas</div>
+          <div class="text-2xl font-bold text-gray-900 mt-1">{{ totalVolume }}</div>
+          <div class="text-xs text-blue-600 mt-1 flex items-center">
+            <ion-icon name="cart-outline" class="mr-1"></ion-icon>
+            Unidades vendidas
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="m-0 bg-white">
+        <ion-card-content>
+          <div class="text-sm text-gray-500 font-medium uppercase">Costo Total</div>
+          <div class="text-2xl font-bold text-gray-900 mt-1">{{ totalCost | currency }}</div>
+          <div class="text-xs text-red-600 mt-1 flex items-center">
+            <ion-icon name="wallet-outline" class="mr-1"></ion-icon>
+            Gastos estimados
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="m-0 bg-white">
+        <ion-card-content>
+          <div class="text-sm text-gray-500 font-medium uppercase">Margen Promedio</div>
+          <div class="text-2xl font-bold text-gray-900 mt-1">{{ averageMargin | number:'1.1-2' }}%</div>
+          <div class="text-xs text-orange-600 mt-1 flex items-center">
+            <ion-icon name="pie-chart-outline" class="mr-1"></ion-icon>
+            Rentabilidad
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <!-- Bar Chart -->
+      <ion-card class="m-0 col-span-1 lg:col-span-2 bg-white">
+        <ion-card-header>
+          <ion-card-title class="text-lg">Rendimiento por Categoría</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="h-64">
+            <canvas baseChart
+              [data]="barChartData"
+              [options]="barChartOptions"
+              [type]="'bar'">
+            </canvas>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Pie Chart -->
+      <ion-card class="m-0 col-span-1 bg-white">
+        <ion-card-header>
+          <ion-card-title class="text-lg">Distribución de Ventas</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="h-64 flex justify-center">
+            <canvas baseChart
+              [data]="pieChartData"
+              [options]="pieChartOptions"
+              [type]="'pie'">
+            </canvas>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Data Table -->
+    <ion-card class="m-0 bg-white">
+      <div class="p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h3 class="text-lg font-bold text-gray-800 m-0">Detalle por Categoría</h3>
+        <div class="w-full sm:w-64">
+          <ion-searchbar 
+            placeholder="Buscar categoría..." 
+            [(ngModel)]="searchTerm" 
+            (ionInput)="applyFilters()"
+            class="h-10 p-0"
+            style="--box-shadow: none; --background: #f3f4f6; border-radius: 8px;">
+          </ion-searchbar>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="toggleSort('name')">
+                Categoría <ion-icon name="swap-vertical-outline" *ngIf="sortColumn === 'name'"></ion-icon>
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="toggleSort('revenue')">
+                Ventas <ion-icon name="swap-vertical-outline" *ngIf="sortColumn === 'revenue'"></ion-icon>
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="toggleSort('salesVolume')">
+                Volumen <ion-icon name="swap-vertical-outline" *ngIf="sortColumn === 'salesVolume'"></ion-icon>
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="toggleSort('margin')">
+                Margen <ion-icon name="swap-vertical-outline" *ngIf="sortColumn === 'margin'"></ion-icon>
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" (click)="toggleSort('growth')">
+                Crecimiento <ion-icon name="swap-vertical-outline" *ngIf="sortColumn === 'growth'"></ion-icon>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let item of filteredMetrics" class="hover:bg-gray-50 transition-colors">
+              <td data-label="Categoría" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.name }}</td>
+              <td data-label="Ventas" class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{{ item.revenue | currency }}</td>
+              <td data-label="Volumen" class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{{ item.salesVolume }}</td>
+              <td data-label="Margen" class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                <span [class.text-green-600]="item.margin >= 20" [class.text-orange-600]="item.margin < 20">
+                  {{ item.margin | number:'1.1-1' }}%
+                </span>
+              </td>
+              <td data-label="Crecimiento" class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="item.growth >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                  <ion-icon [name]="item.growth >= 0 ? 'arrow-up-outline' : 'arrow-down-outline'" class="mr-1"></ion-icon>
+                  {{ Math.abs(item.growth) | number:'1.1-1' }}%
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="filteredMetrics.length === 0">
+              <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                No se encontraron datos que coincidan con la búsqueda.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ion-card>
+  </ng-container>
+</div>

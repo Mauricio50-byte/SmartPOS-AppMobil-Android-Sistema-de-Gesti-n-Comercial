@@ -1,0 +1,119 @@
+:host {
+    display: block;
+}
+
+ion-content.login-wrapper {
+    --background: var(--ion-color-light);
+}
+
+.viewport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: min(100%, 420px);
+    padding: var(--space-24);
+    margin: var(--space-16);
+    background: #fff;
+    border-radius: var(--radius-24);
+    box-shadow: var(--shadow-1);
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-16);
+    margin-bottom: var(--space-24);
+}
+
+.brand-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    background: var(--brand-teal);
+    display: grid;
+    place-items: center;
+}
+
+.brand-icon ion-icon {
+    color: var(--brand-teal-contrast);
+    font-size: 32px;
+}
+
+.brand-name {
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 700;
+    color: var(--ion-color-dark);
+}
+
+.title {
+    font-size: 20px;
+    margin-bottom: var(--space-16);
+    color: var(--ion-color-dark);
+    text-align: center;
+}
+
+.input-item {
+    margin-bottom: var(--space-12);
+    --background: #fff;
+    --border-radius: var(--radius-12);
+    --padding-start: var(--space-12);
+    --inner-padding-end: var(--space-12);
+    border: 1px solid #e0e0e0;
+}
+
+.input-item ion-icon {
+    color: var(--ion-color-medium);
+    font-size: 20px;
+}
+
+.input-item ion-input {
+    --color: var(--ion-color-dark);
+}
+
+.error {
+    color: var(--ion-color-danger);
+    font-size: 14px;
+    margin: 4px 8px 12px;
+}
+
+.remember-row {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-16);
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.actions ion-button {
+    --background: var(--brand-teal);
+    --background-activated: #0d5f5f;
+    --background-hover: #0e6262;
+    --border-radius: var(--radius-12);
+    height: 48px;
+    font-weight: 600;
+}
+
+.forgot {
+    text-align: center;
+    text-decoration: none;
+    color: var(--ion-color-medium);
+}
+
+.offline {
+    margin-top: var(--space-12);
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    .title {
+        font-size: 22px;
+    }
+}

@@ -1,0 +1,104 @@
+.form-card {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 800px;
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        color: var(--ion-color-dark);
+        text-align: center;
+    }
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+        color: var(--ion-color-tertiary);
+        font-weight: 600;
+        border-bottom: 2px solid var(--ion-color-tertiary-tint);
+        padding-bottom: 6px;
+    }
+}
+
+.form-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #fafbfc;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input-item {
+    --background: #ffffff;
+    --color: #1f2937;
+    --padding-start: 12px;
+    --inner-padding-end: 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    --highlight-color-focused: var(--ion-color-tertiary);
+
+    ion-label {
+        color: #4b5563 !important;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    ion-input,
+    ion-textarea,
+    ion-select {
+        --color: #111827;
+        --placeholder-color: #9ca3af;
+    }
+}
+
+.toggle-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-top: 8px;
+    margin-bottom: 24px;
+}
+
+.error-msg {
+    color: var(--ion-color-danger);
+    font-size: 0.8rem;
+    margin-top: -8px;
+    margin-bottom: 12px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.tipo-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #5a67d8;
+
+    h3 {
+        color: white !important;
+        border-bottom-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .input-item {
+        --background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+}

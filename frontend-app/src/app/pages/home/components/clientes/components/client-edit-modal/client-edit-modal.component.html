@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Editar Cliente</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="editForm" (ngSubmit)="guardar()">
+    
+    <ion-item>
+      <ion-label position="stacked">Nombre *</ion-label>
+      <ion-input formControlName="nombre" type="text" placeholder="Nombre completo"></ion-input>
+      <ion-note slot="error" *ngIf="editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched">
+        El nombre es requerido
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Cédula / NIT</ion-label>
+      <ion-input formControlName="cedula" type="text" placeholder="Documento de identidad"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Teléfono</ion-label>
+      <ion-input formControlName="telefono" type="tel" placeholder="Número de contacto"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Correo Electrónico</ion-label>
+      <ion-input formControlName="correo" type="email" placeholder="email@ejemplo.com"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Dirección</ion-label>
+      <ion-input formControlName="direccion" type="text" placeholder="Dirección de residencia"></ion-input>
+    </ion-item>
+
+    <div class="section-divider">
+      Información Financiera
+    </div>
+
+    <ion-item>
+      <ion-label position="stacked">Crédito Máximo ($)</ion-label>
+      <ion-input formControlName="creditoMaximo" type="number" placeholder="0"></ion-input>
+    </ion-item>
+
+    <ion-item class="danger-zone">
+      <ion-label position="stacked" color="danger">Saldo Deuda Actual ($)</ion-label>
+      <ion-input formControlName="saldoDeuda" type="number" placeholder="0"></ion-input>
+      <ion-note slot="helper">Modifique esto solo para correcciones.</ion-note>
+    </ion-item>
+
+    <div class="form-actions ion-margin-top">
+      <ion-button expand="block" type="submit" [disabled]="editForm.invalid">
+        Guardar Cambios
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>

@@ -1,0 +1,44 @@
+<div class="configuracion-container">
+  <div class="tabs-header">
+    <ion-segment [value]="activeTab" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="usuario">
+        <ion-label>Manual de Usuario</ion-label>
+        <ion-icon name="book-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="ayuda">
+        <ion-label>Ayuda & Soporte</ion-label>
+        <ion-icon name="help-buoy-outline"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <div class="tab-content" *ngIf="activeTab === 'usuario'">
+    <app-manual-usuario></app-manual-usuario>
+  </div>
+
+  <div class="tab-content help-content" *ngIf="activeTab === 'ayuda'">
+    <div class="contact-cards">
+      <div class="contact-card" *ngFor="let contacto of contactos">
+        <div class="avatar-container">
+          <!-- Using a generic avatar if no specific avatar image is provided, or we could use the QR as avatar placeholder if needed, but icon is better -->
+          <div class="avatar-circle">
+            <ion-icon name="person"></ion-icon>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <h2 class="contact-name">{{ contacto.nombre }}</h2>
+          <p class="contact-subtitle">Contacto de WhatsApp</p>
+          
+          <div class="qr-container">
+            <img [src]="contacto.qrImage" alt="Código QR de WhatsApp">
+          </div>
+          
+          <p class="info-text">
+            Tu código QR es privado. Si lo compartes con alguien, esa persona podrá escanearlo con la cámara de WhatsApp para añadirte como contacto.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

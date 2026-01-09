@@ -1,0 +1,25 @@
+<div class="cart-item">
+  <div class="item-info">
+    <div class="item-name">{{ item.product.nombre }}</div>
+    <div class="item-price-unit">{{ item.product.precioVenta | currency:'USD':'symbol':'1.0-0' }} x {{ item.quantity }}
+    </div>
+  </div>
+
+  <div class="item-actions">
+    <div class="quantity-controls">
+      <ion-button fill="clear" size="small" (click)="decrement()">
+        <ion-icon slot="icon-only" name="remove-circle-outline"></ion-icon>
+      </ion-button>
+      <span class="quantity-text">{{ item.quantity }}</span> <!-- O input si se prefiere -->
+      <ion-button fill="clear" size="small" (click)="increment()">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </div>
+    <div class="item-total">
+      {{ item.total | currency:'USD':'symbol':'1.0-0' }}
+    </div>
+    <ion-button fill="clear" color="medium" size="small" (click)="onRemove()">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
+</div>

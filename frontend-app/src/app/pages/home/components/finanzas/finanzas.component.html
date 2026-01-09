@@ -1,0 +1,43 @@
+<div class="finanzas-container">
+  <div class="finanzas-header">
+    <h1>Gestión Financiera</h1>
+    <p class="subtitle">Administre deudas de clientes y gastos del negocio</p>
+  </div>
+
+  <div class="segments-container">
+    <ion-segment [value]="segment" (ionChange)="segmentChanged($event)" color="tertiary" scrollable="true">
+      <ion-segment-button value="caja">
+        <ion-label>
+          <ion-icon name="file-tray-full-outline"></ion-icon>
+          Caja Diaria
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="por-cobrar">
+        <ion-label>
+          <ion-icon name="wallet-outline"></ion-icon>
+          Cuentas por Cobrar
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="por-pagar">
+        <ion-label>
+          <ion-icon name="card-outline"></ion-icon>
+          Cuentas por Pagar
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <div class="finanzas-content">
+    <div *ngIf="segment === 'caja'" class="fade-in">
+      <app-caja></app-caja>
+    </div>
+
+    <div *ngIf="segment === 'por-cobrar'" class="fade-in">
+      <app-cuentas-por-cobrar></app-cuentas-por-cobrar>
+    </div>
+    
+    <div *ngIf="segment === 'por-pagar'" class="fade-in">
+      <app-cuentas-por-pagar></app-cuentas-por-pagar>
+    </div>
+  </div>
+</div>

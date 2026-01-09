@@ -1,0 +1,534 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+// Variables & Mixins
+$break-tablet: 768px;
+$break-desktop: 1024px;
+$break-wide: 1400px;
+
+$gap-sm: 12px;
+$gap-md: 16px;
+$gap-lg: 20px;
+
+:root {
+  --ion-color-primary-rgb: 56, 128, 255;
+  --ion-color-success-rgb: 45, 211, 111;
+  --ion-color-warning-rgb: 255, 196, 9;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 100%;
+  padding: $gap-sm;
+  overflow-x: hidden; // Prevent horizontal scroll
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr; // Mobile first: 1 column
+  gap: $gap-sm;
+  width: 100%;
+  
+  // Grid Areas for easier placement management
+  grid-template-areas: 
+    "metrics"
+    "sales"
+    "actions"
+    "transactions"
+    "lowstock"
+    "topproducts"
+    "category"
+    "payment"
+    "customers";
+
+  @media (min-width: $break-tablet) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $gap-md;
+    padding: $gap-md;
+    grid-template-areas: 
+      "metrics metrics"
+      "sales sales"
+      "actions actions"
+      "transactions lowstock"
+      "topproducts category"
+      "payment customers";
+  }
+
+  @media (min-width: $break-desktop) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas: 
+      "metrics metrics metrics"
+      "sales sales actions"
+      "transactions transactions lowstock"
+      "topproducts category payment"
+      "customers customers customers";
+  }
+
+  @media (min-width: $break-wide) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: $gap-lg;
+    grid-template-areas: 
+      "metrics metrics metrics metrics"
+      "sales sales sales actions"
+      "transactions transactions lowstock topproducts"
+      "category payment customers customers";
+  }
+}
+
+// Map areas
+.metrics-area { grid-area: metrics; }
+.sales-chart-area { grid-area: sales; }
+.actions-area { grid-area: actions; }
+.transactions-area { grid-area: transactions; }
+.low-stock-area { grid-area: lowstock; }
+.top-products-area { grid-area: topproducts; }
+.category-area { grid-area: category; }
+.payment-area { grid-area: payment; }
+.customers-area { grid-area: customers; }
+
+// Common Panel Styles
+.panel-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Contain children
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-width: 0; // Fix for grid items overflow
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  .header-info {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .panel-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .panel-subtitle {
+    display: block;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+}
+
+.panel-content {
+  padding: 20px;
+  flex: 1;
+  position: relative;
+
+  &.chart-wrapper {
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.list-container {
+    padding: 0;
+  }
+  
+  &.table-responsive {
+    padding: 0;
+    overflow-x: auto; // Allow internal table scroll only if strictly necessary
+  }
+}
+
+// Metrics Panel (Custom Grid)
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.metric-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  .metric-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+
+    &.income { background: rgba(var(--ion-color-primary-rgb), 0.1); color: var(--ion-color-primary); }
+    &.sales { background: rgba(var(--ion-color-success-rgb), 0.1); color: var(--ion-color-success); }
+    &.clients { background: rgba(255, 159, 28, 0.1); color: #ff9f1c; }
+    &.ticket { background: rgba(156, 39, 176, 0.1); color: #9c27b0; }
+  }
+
+  .metric-info {
+    flex: 1;
+    min-width: 0; // Allow text truncation
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .metric-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .metric-trend {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &.positive { color: var(--ion-color-success); }
+    &.neutral { color: #9ca3af; }
+  }
+}
+
+// Actions Panel
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); // 2 cols on mobile
+  gap: 12px;
+  padding: 16px !important;
+
+  @media (min-width: $break-desktop) {
+    grid-template-columns: 1fr; // Stack on desktop side panel
+  }
+
+  .action-btn {
+    margin: 0;
+    height: 100%;
+    --border-radius: 12px;
+    min-height: 50px;
+
+    .btn-content {
+      display: flex;
+      flex-direction: column; // Stack icon and text for better space
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0;
+      
+      @media (min-width: $break-tablet) {
+        flex-direction: row;
+        gap: 8px;
+      }
+    }
+
+    ion-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+// Charts
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  max-height: 400px;
+}
+
+// Table Styles
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  th {
+    background: #f9fafb;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #6b7280;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  td {
+    font-size: 0.875rem;
+    color: #374151;
+    
+    &.amount {
+      font-weight: 600;
+      font-family: monospace;
+    }
+  }
+
+  .status-badge {
+    display: inline-flex;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    
+    &.success {
+      background: rgba(var(--ion-color-success-rgb), 0.15);
+      color: #059669;
+    }
+  }
+
+  // Mobile Table View (Card style)
+  @media (max-width: $break-tablet) {
+    display: block;
+    
+    thead { display: none; }
+    tbody { display: block; }
+    
+    tr {
+      display: block;
+      margin: 12px;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fdfdfd;
+      
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border: none;
+        
+        &:before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: #6b7280;
+        }
+        
+        &:last-child { padding-bottom: 0; }
+        &:first-child { padding-top: 0; font-weight: bold; color: var(--ion-color-primary); }
+      }
+    }
+  }
+}
+
+// Low Stock List
+.stock-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child { border-bottom: none; }
+
+  .stock-info {
+    min-width: 0; // text truncation fix
+    padding-right: 12px;
+    
+    .stock-name {
+      font-weight: 600;
+      color: #111827;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .stock-meta {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+  }
+
+  .stock-badge {
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    
+    &.warning {
+      background: rgba(var(--ion-color-warning-rgb), 0.1);
+      color: #d97706;
+    }
+  }
+}
+
+.empty-state, .empty-text {
+  padding: 30px;
+  text-align: center;
+  color: #9ca3af;
+  
+  ion-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    display: block;
+    margin: 0 auto 8px auto;
+  }
+}
+
+// Filter Control
+.filter-control {
+  ion-select {
+    min-width: 100px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    --padding-top: 6px;
+    --padding-bottom: 6px;
+  }
+}
+
+// Loading State
+.loading-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top-color: var(--ion-color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+  }
+  
+  span {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Top Products List
+.top-product-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-product-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px; // Consistent padding
+  border-bottom: 1px solid #f3f4f6;
+  gap: 12px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .rank-badge {
+    width: 24px;
+    height: 24px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .product-details {
+    flex: 1;
+    min-width: 0;
+
+    .product-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-bar-bg {
+      height: 6px;
+      background: #f3f4f6;
+      border-radius: 3px;
+      width: 100%;
+      overflow: hidden;
+
+      .product-bar-fill {
+        height: 100%;
+        background: var(--ion-color-primary);
+        border-radius: 3px;
+        transition: width 0.5s ease-out;
+      }
+    }
+  }
+
+  .product-stats {
+    text-align: right;
+    min-width: 60px;
+
+    .stat-qty {
+      font-weight: 700;
+      color: #111827;
+      font-size: 0.95rem;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+  }
+}

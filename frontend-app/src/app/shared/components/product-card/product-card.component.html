@@ -1,0 +1,17 @@
+<div class="product-card" (click)="onAdd()">
+  <div class="icon-container">
+    <!-- Icono por defecto si no hay imagen específica -->
+    <ion-icon name="shirt-outline" *ngIf="!product.image && product.nombre.toLowerCase().includes('cam')"></ion-icon>
+    <ion-icon name="pricetag-outline"
+      *ngIf="!product.image && !product.nombre.toLowerCase().includes('cam')"></ion-icon>
+    <img [src]="product.image" *ngIf="product.image" alt="Product Image">
+  </div>
+  <div class="product-name">
+    {{ product.nombre }}
+  </div>
+
+  <!-- Opcional: Mostrar precio en la tarjeta si se desea -->
+  <div class="product-price">
+    {{ product.precioVenta | currency:'USD':'symbol':'1.0-0' }}
+  </div>
+</div>

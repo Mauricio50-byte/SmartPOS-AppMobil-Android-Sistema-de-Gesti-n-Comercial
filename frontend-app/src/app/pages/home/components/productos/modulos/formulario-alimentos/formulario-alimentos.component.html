@@ -1,0 +1,21 @@
+<div [formGroup]="parentForm" class="form-section">
+    <h3>Detalles de Alimentos</h3>
+    <div class="two-columns">
+        <ion-item class="input-item">
+            <ion-label position="stacked">Fecha Vencimiento</ion-label>
+            <ion-input type="date" formControlName="fechaVencimiento"></ion-input>
+        </ion-item>
+        <ion-item class="input-item">
+            <ion-label position="stacked">Lote</ion-label>
+            <ion-input formControlName="lote"></ion-input>
+        </ion-item>
+    </div>
+    <ion-item class="input-item">
+        <ion-label position="stacked">Registro Sanitario</ion-label>
+        <ion-input formControlName="registroSanitario"></ion-input>
+    </ion-item>
+    <ion-item lines="none" class="toggle-item">
+        <ion-label>Es Perecedero</ion-label>
+        <ion-toggle slot="end" formControlName="esPerecedero"></ion-toggle>
+    </ion-item>
+</div>

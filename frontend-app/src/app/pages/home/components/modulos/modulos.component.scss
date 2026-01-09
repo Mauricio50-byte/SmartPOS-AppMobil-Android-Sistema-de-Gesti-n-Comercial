@@ -1,0 +1,148 @@
+.header-container {
+  padding: 20px;
+  background: white;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
+
+  .subtitle {
+    margin: 5px 0 0;
+    color: #666;
+  }
+}
+
+.section-header {
+  padding: 20px 20px 10px;
+  
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #444;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 5px 0 0;
+    color: #888;
+    font-size: 14px;
+  }
+}
+
+.divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 10px 20px 30px;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 0 20px 20px;
+}
+
+.module-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+
+  &.active {
+    border-color: var(--ion-color-success);
+    background: #f8fff9;
+  }
+
+  &.system-card {
+    background: #f8f9fa;
+    border-color: #e9ecef;
+    
+    .icon-wrapper {
+      background: #e2e6ea;
+      color: #495057;
+    }
+
+    .status-badge {
+      background: #e2e6ea;
+      color: #495057;
+    }
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+
+    .icon-wrapper {
+      width: 50px;
+      height: 50px;
+      background: #f0f2f5;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .card-content {
+    h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  .card-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+
+    .status-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: #eee;
+      color: #666;
+
+      &.active {
+        background: var(--ion-color-success-tint);
+        color: var(--ion-color-success-shade);
+      }
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+  color: #666;
+
+  ion-spinner {
+    margin-bottom: 10px;
+  }
+}

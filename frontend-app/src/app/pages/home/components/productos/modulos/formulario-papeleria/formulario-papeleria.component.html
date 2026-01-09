@@ -1,0 +1,27 @@
+<div [formGroup]="parentForm" class="form-section">
+    <h3>Detalles de Papelería</h3>
+    <div class="two-columns">
+        <ion-item class="input-item">
+            <ion-label position="stacked">Tipo de Papel</ion-label>
+            <ion-input formControlName="tipoPapel" placeholder="Ej. Bond, Periódico"></ion-input>
+        </ion-item>
+        <ion-item class="input-item">
+            <ion-label position="stacked">Gramaje</ion-label>
+            <ion-input formControlName="gramaje" placeholder="Ej. 75g"></ion-input>
+        </ion-item>
+    </div>
+    <div class="two-columns">
+        <ion-item class="input-item">
+            <ion-label position="stacked">Dimensiones</ion-label>
+            <ion-input formControlName="dimensiones" placeholder="Ej. Carta, Oficio"></ion-input>
+        </ion-item>
+        <ion-item class="input-item">
+            <ion-label position="stacked">Material</ion-label>
+            <ion-input formControlName="material" placeholder="Ej. Plástico, Metal"></ion-input>
+        </ion-item>
+    </div>
+    <ion-item lines="none" class="toggle-item">
+        <ion-label>Es Kit</ion-label>
+        <ion-toggle slot="end" formControlName="esKit"></ion-toggle>
+    </ion-item>
+</div>

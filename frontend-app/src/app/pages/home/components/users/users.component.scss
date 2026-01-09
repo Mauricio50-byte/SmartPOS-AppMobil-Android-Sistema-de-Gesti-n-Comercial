@@ -1,0 +1,327 @@
+// Variables CSS
+:root {
+  --brand-primary: #0d9488;
+  --brand-primary-rgb: 13, 148, 136;
+  --brand-secondary: #f59e0b;
+  --brand-danger: #ef4444;
+  --brand-success: #10b981;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --bg-card: #ffffff;
+  --bg-page: #f9fafb;
+}
+
+.usuarios-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100%;
+}
+
+// Page Header
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827 !important;
+    /* Force black */
+  }
+
+  .subtitle {
+    margin: 4px 0 0;
+    color: #4b5563 !important;
+    /* Force dark grey */
+    font-size: 15px;
+  }
+
+  ion-button {
+    --border-radius: 8px;
+    font-weight: 600;
+    --box-shadow: 0 4px 6px -1px rgba(var(--brand-primary-rgb), 0.2);
+  }
+}
+
+// Grid
+.usuarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+// User Card
+.usuario-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #d1d5db;
+  }
+}
+
+.card-header {
+  padding: 20px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.usuario-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+
+  &.admin {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+  }
+
+  &.trabajador {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.2);
+  }
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+
+  &.activo {
+    background-color: #ecfdf5;
+    color: #059669;
+  }
+
+  &.inactivo {
+    background-color: #fef2f2;
+    color: #dc2626;
+  }
+}
+
+.card-body {
+  padding: 16px 20px;
+  flex: 1;
+
+  .usuario-nombre {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827 !important;
+    /* Force dark text */
+  }
+
+  .usuario-email {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: #6b7280 !important;
+    /* Force grey text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.roles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.role-badge {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+
+  &.empty {
+    font-style: italic;
+    color: #9ca3af;
+    background: transparent;
+    border: 1px dashed #d1d5db;
+  }
+}
+
+.card-actions {
+  padding: 12px 20px;
+  background-color: #f9fafb;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+
+  ion-button {
+    margin: 0;
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
+}
+
+// Empty State
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: white;
+  border-radius: 16px;
+  border: 1px dashed #e5e7eb;
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+
+    ion-icon {
+      font-size: 40px;
+      color: #9ca3af;
+    }
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+// Responsive
+@media (max-width: 640px) {
+  .usuarios-container {
+    padding: 16px;
+  }
+
+  .usuarios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-actions {
+    justify-content: space-between;
+
+    ion-button {
+      flex: 1;
+    }
+  }
+}
+
+// User Form Styles
+.user-form-modal {
+  --border-radius: 16px;
+  --max-width: 600px;
+  --max-height: 85vh;
+  
+  @media (max-width: 768px) {
+    --max-width: 100%;
+    --max-height: 100%;
+    --border-radius: 0;
+  }
+}
+
+.professional-form {
+  padding-bottom: 24px;
+
+  .form-section {
+    margin-bottom: 24px;
+    
+    h4 {
+      margin: 0 0 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+    
+    ion-label {
+      font-weight: 600;
+      color: #374151 !important;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    
+    ion-input, ion-select {
+      --padding-start: 12px;
+      --padding-end: 12px;
+      --padding-top: 10px;
+      --padding-bottom: 10px;
+      --background: white;
+      border-radius: 8px;
+      --border-color: #d1d5db;
+      --border-radius: 8px;
+      font-size: 14px;
+    }
+    
+    .helper-text {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    
+    .error-msg {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--brand-danger);
+    }
+  }
+  
+  .submit-btn {
+    margin-top: 32px;
+    --box-shadow: 0 4px 6px -1px rgba(var(--brand-primary-rgb), 0.3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}

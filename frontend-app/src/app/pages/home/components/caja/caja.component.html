@@ -1,0 +1,123 @@
+<div class="caja-content-wrapper">
+  <div class="header-section">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h1>Gestión de Caja</h1>
+        <p class="subtitle">Control diario de flujo de efectivo</p>
+      </div>
+      <ion-button fill="clear" (click)="cargarEstadoCaja()">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+    <p>Cargando información de caja...</p>
+  </div>
+
+  <div *ngIf="!loading && !caja">
+    <ion-card class="welcome-card">
+      <ion-card-header>
+        <ion-card-title>Caja Cerrada</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="ion-text-center">
+        <ion-icon name="lock-closed-outline" size="large" color="medium"></ion-icon>
+        <p>No tienes una caja abierta actualmente.</p>
+        <ion-button expand="block" (click)="abrirCaja()" class="ion-margin-top">
+          <ion-icon name="key-outline" slot="start"></ion-icon>
+          Abrir Caja
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div *ngIf="!loading && caja">
+    <!-- Resumen de Caja -->
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="4">
+          <ion-card class="stat-card balance">
+            <ion-card-header>
+              <ion-card-subtitle>Saldo Total</ion-card-subtitle>
+              <ion-card-title>{{ caja.resumen?.saldoActual | currency }}</ion-card-title>
+              <p class="small-text">Efectivo: {{ caja.resumen?.saldoEfectivo | currency }}</p>
+              <p class="small-text">Transferencias: {{ saldoTransferencia | currency }}</p>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="4">
+          <ion-card class="stat-card income">
+            <ion-card-header>
+              <ion-card-subtitle>Ingresos Totales</ion-card-subtitle>
+              <ion-card-title class="success-text">{{ caja.resumen?.totalIngresos | currency }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="4">
+          <ion-card class="stat-card expense">
+            <ion-card-header>
+              <ion-card-subtitle>Egresos Totales</ion-card-subtitle>
+              <ion-card-title class="danger-text">{{ caja.resumen?.totalEgresos | currency }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Acciones -->
+    <div class="actions-container">
+      <ion-button color="success" (click)="registrarMovimiento('INGRESO')">
+        <ion-icon name="arrow-up-circle-outline" slot="start"></ion-icon>
+        Registrar Ingreso
+      </ion-button>
+      <ion-button color="danger" (click)="registrarMovimiento('EGRESO')">
+        <ion-icon name="arrow-down-circle-outline" slot="start"></ion-icon>
+        Registrar Egreso
+      </ion-button>
+      <ion-button color="medium" fill="outline" (click)="cerrarCaja()">
+        <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+        Cerrar Caja
+      </ion-button>
+    </div>
+
+    <!-- Lista de Movimientos -->
+    <h3 class="ion-margin-top">Movimientos del Turno</h3>
+    
+    <div class="table-container">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Tipo</th>
+            <th>Método</th>
+            <th>Descripción</th>
+            <th class="ion-text-end">Monto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mov of movimientos">
+            <td>{{ mov.fecha | date:'shortTime' }}</td>
+            <td>
+              <ion-chip [color]="mov.tipo.includes('INGRESO') || mov.tipo.includes('VENTA') || mov.tipo.includes('ABONO') ? 'success' : 'danger'" outline="true">
+                {{ mov.tipo }}
+              </ion-chip>
+            </td>
+            <td>
+              <ion-badge color="medium" mode="ios">{{ mov.metodoPago || 'EFECTIVO' }}</ion-badge>
+            </td>
+            <td>{{ mov.descripcion }}</td>
+            <td class="ion-text-end font-bold" 
+                [class.success-text]="mov.tipo.includes('INGRESO') || mov.tipo.includes('VENTA') || mov.tipo.includes('ABONO')"
+                [class.danger-text]="mov.tipo.includes('EGRESO') || mov.tipo.includes('PAGO')">
+              {{ mov.monto | currency }}
+            </td>
+          </tr>
+          <tr *ngIf="movimientos.length === 0">
+            <td colspan="5" class="ion-text-center">No hay movimientos registrados aún.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

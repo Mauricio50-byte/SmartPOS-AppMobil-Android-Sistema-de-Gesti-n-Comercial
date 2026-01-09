@@ -1,0 +1,218 @@
+.filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: center;
+
+    .search-wrapper {
+        flex: 1;
+        min-width: 280px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+        ion-searchbar {
+            --background: transparent;
+            padding-top: 0;
+            padding-bottom: 0;
+            height: 48px;
+        }
+    }
+
+    .module-selector {
+        min-width: 220px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        
+        .filter-item {
+            --background: transparent;
+            --min-height: 48px;
+            
+            ion-select {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    }
+}
+
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+        font-weight: 600;
+        color: var(--ion-color-medium);
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        background: #fafafa;
+        white-space: nowrap;
+    }
+
+    td {
+        color: #000000;
+        vertical-align: middle;
+    }
+
+    .low-stock {
+        color: var(--ion-color-danger);
+        font-weight: bold;
+    }
+    
+    .low-stock-text {
+        color: var(--ion-color-danger);
+        font-weight: bold;
+    }
+
+    .out-of-stock {
+        color: #c0392b;
+        font-weight: bold;
+        background: #fadbd8;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .empty-cell {
+        text-align: center;
+        padding: 30px;
+        color: var(--ion-color-medium);
+    }
+
+    .actions {
+        white-space: nowrap;
+    }
+}
+
+// RESPONSIVE MOBILE VIEW
+@media screen and (max-width: 768px) {
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+        
+        .search-wrapper, .module-selector {
+            width: 100%;
+            min-width: unset;
+        }
+    }
+
+    .products-table {
+        display: block;
+
+        thead {
+            display: none;
+        }
+
+        tbody {
+            display: block;
+        }
+
+        tr {
+            display: block;
+            margin-bottom: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right;
+            padding: 10px 16px;
+            border-bottom: 1px solid #f5f5f5;
+            min-height: 40px;
+            font-size: 0.9rem;
+
+            &:last-child {
+                border-bottom: none;
+                background: #fafafa;
+                justify-content: flex-end;
+                padding: 8px 16px;
+            }
+
+            &::before {
+                content: attr(data-label);
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: var(--ion-color-medium);
+                text-transform: uppercase;
+                margin-right: 16px;
+                text-align: left;
+                min-width: 100px; /* Ensure labels align somewhat nicely */
+            }
+
+            /* Estilo especial para el Nombre del Producto (Cabecera de la tarjeta) */
+            &[data-label="Producto"] {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: center;
+                text-align: left;
+                background-color: #f8f9fa;
+                padding: 14px 16px;
+                border-bottom: 2px solid #eaeaea;
+
+                &::before {
+                    display: none; /* Ocultar la etiqueta "Producto" */
+                }
+
+                strong {
+                    font-size: 1.1rem;
+                    color: var(--ion-color-dark);
+                    font-weight: 700;
+                }
+            }
+
+            /* Resaltar Precios */
+            &[data-label="P. Venta"], &[data-label="Precio"] {
+                color: var(--ion-color-success);
+                font-weight: 600;
+                font-size: 1rem;
+            }
+            
+            &[data-label="P. Costo"] {
+                color: var(--ion-color-medium);
+            }
+            
+            &[data-label="Stock"] {
+                font-weight: 600;
+            }
+        }
+        
+        // Hide empty cell special formatting in mobile for better look
+        .empty-cell {
+            display: block;
+            text-align: center;
+            width: 100%;
+            
+            &::before {
+                display: none;
+            }
+        }
+    }
+    
+    // Remove table container shadow/bg in mobile since cards have their own
+    .table-container {
+        background: transparent;
+        box-shadow: none;
+    }
+}

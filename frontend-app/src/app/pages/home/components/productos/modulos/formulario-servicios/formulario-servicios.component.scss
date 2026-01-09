@@ -1,0 +1,56 @@
+.form-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #fafbfc;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+        color: var(--ion-color-tertiary);
+        font-weight: 600;
+        border-bottom: 2px solid var(--ion-color-tertiary-tint);
+        padding-bottom: 6px;
+    }
+}
+
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input-item {
+    --background: #ffffff;
+    --color: #1f2937;
+    --padding-start: 12px;
+    --inner-padding-end: 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    --highlight-color-focused: var(--ion-color-tertiary);
+
+    ion-label {
+        color: #4b5563 !important;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    ion-input {
+        --color: #111827;
+        --placeholder-color: #9ca3af;
+    }
+}
+
+.toggle-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-top: 8px;
+    margin-bottom: 24px;
+}

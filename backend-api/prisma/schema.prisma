@@ -1,0 +1,362 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id              Int              @id @default(autoincrement())
+  nombre          String
+  correo          String           @unique
+  passwordHash    String
+  activo          Boolean          @default(true)
+  creadoEn        DateTime         @default(now())
+  negocioId       Int?
+  accessMethod    String           @default("STANDARD")
+  adminPorDefecto Boolean          @default(false)
+  loginToken      String?          @unique
+  loginTokenExp   DateTime?
+  logs            AuditLog[]
+  pagosGastos     PagoGasto[]
+  negocio         Negocio?         @relation(fields: [negocioId], references: [id])
+  modulos         UsuarioModulo[]
+  permisos        UsuarioPermiso[]
+  roles           UsuarioRol[]
+  ventas          Venta[]
+  cajas           Caja[]
+  movimientosCaja MovimientoCaja[]
+}
+
+model Caja {
+  id            Int              @id @default(autoincrement())
+  usuarioId     Int
+  usuario       Usuario          @relation(fields: [usuarioId], references: [id])
+  fechaApertura DateTime         @default(now())
+  fechaCierre   DateTime?
+  montoInicial  Float
+  montoFinal    Float?           // Monto real en caja al cierre
+  montoSistema  Float?           // Monto calculado por el sistema
+  diferencia    Float?           // Diferencia (montoFinal - montoSistema)
+  estado        String           @default("ABIERTA") // ABIERTA, CERRADA
+  observaciones String?
+  movimientos   MovimientoCaja[]
+}
+
+model MovimientoCaja {
+  id          Int      @id @default(autoincrement())
+  cajaId      Int
+  caja        Caja     @relation(fields: [cajaId], references: [id])
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+  tipo        String   // INGRESO, EGRESO, VENTA, PAGO_GASTO, ABONO_VENTA
+  metodoPago  String   @default("EFECTIVO") // EFECTIVO, TRANSFERENCIA, TARJETA, ETC.
+  monto       Float
+  descripcion String?
+  fecha       DateTime @default(now())
+  
+  // Relaciones opcionales para trazabilidad
+  ventaId     Int?
+  gastoId     Int?
+  abonoId     Int?
+}
+
+model Modulo {
+  id            String          @id
+  nombre        String
+  descripcion   String?
+  tipo          String          @default("SISTEMA")
+  activo        Boolean         @default(false)
+  version       String          @default("1.0.0")
+  config        Json?
+  creadoEn      DateTime        @default(now())
+  actualizadoEn DateTime        @updatedAt
+  negocios      NegocioModulo[]
+  permisos      Permiso[]
+  usuarios      UsuarioModulo[]
+}
+
+model Negocio {
+  id             Int             @id @default(autoincrement())
+  nombre         String
+  planMaxModulos Int             @default(3)
+  creadoEn       DateTime        @default(now())
+  modulos        NegocioModulo[]
+  usuarios       Usuario[]
+}
+
+model NegocioModulo {
+  negocioId Int
+  moduloId  String
+  activo    Boolean @default(false)
+  modulo    Modulo  @relation(fields: [moduloId], references: [id], onDelete: Cascade)
+  negocio   Negocio @relation(fields: [negocioId], references: [id], onDelete: Cascade)
+
+  @@id([negocioId, moduloId])
+}
+
+model UsuarioModulo {
+  usuarioId Int
+  moduloId  String
+  modulo    Modulo  @relation(fields: [moduloId], references: [id], onDelete: Cascade)
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([usuarioId, moduloId])
+}
+
+model Producto {
+  id                 Int                  @id @default(autoincrement())
+  tipo               String               @default("GENERAL")
+  nombre             String
+  sku                String?              @unique
+  descripcion        String?
+  imagen             String?
+  categoria          String?
+  subcategoria       String?
+  marca              String?
+  precioCosto        Float?               @default(0)
+  precioVenta        Float
+  descuento          Float?               @default(0)
+  stock              Int                  @default(0)
+  stockMinimo        Int?                 @default(0)
+  unidadMedida       String?              @default("UNIDAD")
+  iva                Float?               @default(0)
+  proveedor          String?
+  activo             Boolean              @default(true)
+  creadoEn           DateTime             @default(now())
+  actualizadoEn      DateTime             @updatedAt
+  detalles           DetalleVenta[]
+  detalleAlimento    ProductoAlimento?
+  detalleFarmacia    ProductoFarmacia?
+  detallePapeleria   ProductoPapeleria?
+  detalleRestaurante ProductoRestaurante?
+  detalleRopa        ProductoRopa?
+  detalleServicio    ProductoServicio?
+}
+
+model ProductoRopa {
+  id         Int      @id @default(autoincrement())
+  productoId Int      @unique
+  talla      String?
+  color      String?
+  material   String?
+  genero     String?
+  temporada  String?
+  producto   Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+}
+
+model ProductoAlimento {
+  id                      Int       @id @default(autoincrement())
+  productoId              Int       @unique
+  fechaVencimiento        DateTime?
+  lote                    String?
+  registroSanitario       String?
+  ingredientes            String?
+  esPerecedero            Boolean   @default(true)
+  temperaturaConservacion String?
+  producto                Producto  @relation(fields: [productoId], references: [id], onDelete: Cascade)
+}
+
+model ProductoServicio {
+  id           Int      @id @default(autoincrement())
+  productoId   Int      @unique
+  duracion     Int?
+  responsable  String?
+  requiereCita Boolean  @default(false)
+  garantiaDias Int?
+  producto     Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+}
+
+model ProductoFarmacia {
+  id               Int       @id @default(autoincrement())
+  productoId       Int       @unique
+  componenteActivo String?
+  presentacion     String?
+  dosis            String?
+  laboratorio      String?
+  requiereReceta   Boolean   @default(false)
+  fechaVencimiento DateTime?
+  lote             String?
+  registroInvima   String?
+  producto         Producto  @relation(fields: [productoId], references: [id], onDelete: Cascade)
+}
+
+model ProductoPapeleria {
+  id          Int      @id @default(autoincrement())
+  productoId  Int      @unique
+  tipoPapel   String?
+  gramaje     String?
+  dimensiones String?
+  material    String?
+  esKit       Boolean  @default(false)
+  producto    Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+}
+
+model ProductoRestaurante {
+  id                Int      @id @default(autoincrement())
+  productoId        Int      @unique
+  ingredientes      String?
+  tiempoPreparacion Int?
+  esVegano          Boolean  @default(false)
+  esVegetariano     Boolean  @default(false)
+  tieneAlcohol      Boolean  @default(false)
+  calorias          Int?
+  producto          Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+}
+
+model Cliente {
+  id            Int      @id @default(autoincrement())
+  nombre        String
+  correo        String?  @unique
+  telefono      String?
+  cedula        String?  @unique
+  direccion     String?
+  activo        Boolean  @default(true)
+  creditoMaximo Float    @default(0)
+  diasCredito   Int      @default(30)
+  saldoDeuda    Float    @default(0)
+  puntos        Int      @default(0)
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+  abonos        Abono[]
+  deudas        Deuda[]
+  ventas        Venta[]
+}
+
+model Venta {
+  id             Int            @id @default(autoincrement())
+  fecha          DateTime       @default(now())
+  total          Float
+  clienteId      Int?
+  usuarioId      Int
+  metodoPago     String         @default("EFECTIVO")
+  estadoPago     String         @default("PAGADO")
+  montoPagado    Float          @default(0)
+  saldoPendiente Float          @default(0)
+  detalles       DetalleVenta[]
+  deuda          Deuda?
+  cliente        Cliente?       @relation(fields: [clienteId], references: [id])
+  usuario        Usuario        @relation(fields: [usuarioId], references: [id])
+}
+
+model Rol {
+  id          Int          @id @default(autoincrement())
+  nombre      String       @unique
+  descripcion String?
+  permisos    RolPermiso[]
+  usuarios    UsuarioRol[]
+}
+
+model Permiso {
+  id          Int              @id @default(autoincrement())
+  clave       String           @unique
+  descripcion String?
+  moduloId    String?
+  modulo      Modulo?          @relation(fields: [moduloId], references: [id])
+  roles       RolPermiso[]
+  usuarios    UsuarioPermiso[]
+}
+
+model UsuarioRol {
+  usuarioId Int
+  rolId     Int
+  rol       Rol     @relation(fields: [rolId], references: [id])
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@id([usuarioId, rolId])
+}
+
+model RolPermiso {
+  rolId     Int
+  permisoId Int
+  permiso   Permiso @relation(fields: [permisoId], references: [id])
+  rol       Rol     @relation(fields: [rolId], references: [id])
+
+  @@id([rolId, permisoId])
+}
+
+model UsuarioPermiso {
+  usuarioId Int
+  permisoId Int
+  permiso   Permiso @relation(fields: [permisoId], references: [id])
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@id([usuarioId, permisoId])
+}
+
+model DetalleVenta {
+  id             Int      @id @default(autoincrement())
+  ventaId        Int
+  productoId     Int
+  cantidad       Int
+  precioUnitario Float
+  subtotal       Float
+  producto       Producto @relation(fields: [productoId], references: [id])
+  venta          Venta    @relation(fields: [ventaId], references: [id])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int?
+  accion    String
+  detalle   String?
+  fecha     DateTime @default(now())
+  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
+}
+
+model Deuda {
+  id               Int       @id @default(autoincrement())
+  clienteId        Int
+  ventaId          Int       @unique
+  montoTotal       Float
+  saldoPendiente   Float
+  estado           String    @default("PENDIENTE")
+  fechaCreacion    DateTime  @default(now())
+  fechaVencimiento DateTime?
+  abonos           Abono[]
+  cliente          Cliente   @relation(fields: [clienteId], references: [id])
+  venta            Venta     @relation(fields: [ventaId], references: [id])
+}
+
+model Abono {
+  id         Int      @id @default(autoincrement())
+  deudaId    Int
+  clienteId  Int
+  monto      Float
+  metodoPago String   @default("EFECTIVO")
+  fecha      DateTime @default(now())
+  usuarioId  Int?
+  nota       String?
+  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  deuda      Deuda    @relation(fields: [deudaId], references: [id])
+}
+
+model Gasto {
+  id               Int         @id @default(autoincrement())
+  proveedor        String
+  concepto         String
+  montoTotal       Float
+  saldoPendiente   Float
+  fechaVencimiento DateTime?
+  estado           String      @default("PENDIENTE")
+  fechaRegistro    DateTime    @default(now())
+  categoria        String?
+  pagos            PagoGasto[]
+}
+
+model PagoGasto {
+  id         Int      @id @default(autoincrement())
+  gastoId    Int
+  monto      Float
+  fecha      DateTime @default(now())
+  metodoPago String   @default("EFECTIVO")
+  usuarioId  Int?
+  nota       String?
+  gasto      Gasto    @relation(fields: [gastoId], references: [id])
+  usuario    Usuario? @relation(fields: [usuarioId], references: [id])
+}
+
+// Update: Added manually to append to file, but I need to edit the file content properly.
+

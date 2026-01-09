@@ -1,0 +1,217 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Gestión de Permisos y Accesos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" color="medium">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="activeTab" value="roles">
+      <ion-segment-button value="roles" *ngIf="actorEsAdmin">
+        <ion-label>Roles</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="permisos" *ngIf="actorEsAdmin">
+        <ion-label>Permisos Extra</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="modulos" *ngIf="actorEsAdmin && usuario && usuario.negocioId">
+        <ion-label>Módulos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <!-- User Summary Card -->
+  <div class="user-summary-card" *ngIf="usuario">
+    <div class="user-avatar">
+      {{ usuario.nombre.charAt(0).toUpperCase() }}
+    </div>
+    <div class="user-details">
+      <h3>{{ usuario.nombre }}</h3>
+      <p>{{ usuario.correo }}</p>
+      <p *ngIf="usuario.roles && usuario.roles.length > 0" style="margin-top: 4px; font-size: 12px; color: var(--ion-color-primary);">
+        <ion-icon name="shield-checkmark-outline"></ion-icon> {{ usuario.roles.join(', ') }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Roles Tab -->
+  <div *ngIf="actorEsAdmin" [hidden]="activeTab !== 'roles'" class="roles-section">
+    <h4>Asignar Roles</h4>
+    <p class="helper-text">Seleccione los roles para definir el nivel de acceso principal del usuario. Los roles incluyen un conjunto predefinido de permisos.</p>
+    
+    <div class="permissions-grid">
+      <div *ngFor="let rol of roles" 
+           class="role-card" 
+           [class.selected]="isRoleSelected(rol.nombre)"
+           (click)="toggleRole(rol.nombre)">
+        <div class="card-header">
+          <h5>{{ rol.nombre }}</h5>
+          <ion-checkbox 
+            [checked]="isRoleSelected(rol.nombre)"
+            (click)="$event.stopPropagation()">
+          </ion-checkbox>
+        </div>
+        <div class="card-body">
+          <p>{{ rol.descripcion || 'Sin descripción disponible' }}</p>
+          <div class="permisos-preview" *ngIf="rol.permisos && rol.permisos.length > 0">
+            <ion-chip *ngFor="let p of rol.permisos | slice:0:5">
+              {{ p.permiso.clave }}
+            </ion-chip>
+            <ion-chip *ngIf="rol.permisos.length > 5" color="light">
+              +{{ rol.permisos.length - 5 }} más
+            </ion-chip>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="loading && roles.length === 0" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando roles disponibles...</p>
+    </div>
+    <div *ngIf="!loading && roles.length === 0" class="loading-state">
+      <p *ngIf="rolesLoadError">Error al cargar roles.</p>
+      <p *ngIf="!rolesLoadError">No hay roles definidos en el sistema.</p>
+    </div>
+  </div>
+
+  <!-- Permissions Tab -->
+  <div *ngIf="actorEsAdmin" [hidden]="activeTab !== 'permisos'" class="permisos-section">
+    <h4>Permisos Individuales (Excepciones)</h4>
+    <p class="helper-text">Otorgue permisos específicos adicionales a los que ya proporciona el rol. Los permisos heredados del rol no se pueden desactivar aquí.</p>
+
+    <div *ngFor="let group of groupedPermissions">
+      <h5 style="margin-top: 16px; margin-bottom: 8px; color: var(--ion-color-medium); border-bottom: 1px solid var(--ion-color-light); padding-bottom: 4px; font-size: 14px; font-weight: 600;">
+        {{ group.module }}
+      </h5>
+      <div class="permissions-grid">
+        <div *ngFor="let permiso of group.permissions" 
+             class="permission-card"
+             [class.selected]="isPermissionDirect(permiso)"
+             [class.inherited]="isPermissionInherited(permiso)"
+             (click)="!isPermissionInherited(permiso) && toggleDirectPermission(permiso)">
+          
+          <div class="card-header">
+            <h5>{{ permiso }}</h5>
+            <ion-checkbox 
+              [checked]="isPermissionDirect(permiso) || isPermissionInherited(permiso)"
+              [disabled]="isPermissionInherited(permiso)"
+              (click)="$event.stopPropagation()">
+            </ion-checkbox>
+          </div>
+          
+          <div class="card-body">
+            <p>{{ getPermissionDescription(permiso) }}</p>
+            <div *ngIf="isPermissionInherited(permiso)" class="inherited-badge">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              Heredado del Rol
+            </div>
+            <div *ngIf="isPermissionDirect(permiso)" class="inherited-badge" style="background-color: var(--ion-color-primary-tint); color: var(--ion-color-primary-shade);">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              Asignado Directamente
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modules Tab -->
+  <div *ngIf="(actorAdminPorDefecto || actorEsAdmin) && usuario" [hidden]="activeTab !== 'modulos'" class="permisos-section">
+    <h4>Módulos Activos</h4>
+    <p class="helper-text">Habilite los módulos operativos a los que este usuario tendrá acceso.</p>
+
+    <!-- Módulos del Sistema -->
+    <div class="section-header">
+      <h5>Módulos del Sistema</h5>
+      <p>Módulos base del sistema. Pueden ser restringidos si es necesario.</p>
+    </div>
+    
+    <div class="modules-grid">
+      <div *ngFor="let mod of modulosSistema" 
+           class="module-card system-card"
+           [class.selected]="isModuleSelected(mod.id)"
+           (click)="toggleModule(mod.id)">
+           
+        <div class="card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <ion-icon name="cube-outline"></ion-icon>
+            <h5>{{ mod.nombre }}</h5>
+          </div>
+          <ion-checkbox
+            [checked]="isModuleSelected(mod.id)"
+            (click)="$event.stopPropagation()">
+          </ion-checkbox>
+        </div>
+        
+        <div class="card-body">
+          <p>{{ mod.descripcion }}</p>
+          <ion-badge color="medium" mode="ios">SISTEMA</ion-badge>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Módulos de Negocio -->
+    <div class="section-header">
+      <h5>Módulos de Negocio</h5>
+      <p>Módulos específicos activados para este negocio.</p>
+    </div>
+
+    <div class="modules-grid">
+      <div *ngFor="let mod of modulosNegocio" 
+           class="module-card"
+           [class.selected]="isModuleSelected(mod.id)"
+           (click)="toggleModule(mod.id)">
+           
+        <div class="card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <ion-icon [name]="mod.id === 'ropa' ? 'shirt-outline' : mod.id === 'alimentos' ? 'restaurant-outline' : 'briefcase-outline'"></ion-icon>
+            <h5>{{ mod.nombre }}</h5>
+          </div>
+          <ion-checkbox
+            [checked]="isModuleSelected(mod.id)"
+            (click)="$event.stopPropagation()">
+          </ion-checkbox>
+        </div>
+        
+        <div class="card-body">
+          <p>{{ mod.descripcion }}</p>
+          <ion-badge color="success" *ngIf="mod.activo">Activo</ion-badge>
+          <ion-badge color="medium" *ngIf="!mod.activo">Inactivo (Se activará al guardar)</ion-badge>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="availableModules.length === 0" class="loading-state">
+      <p *ngIf="modulesLoadError">Error al cargar módulos.</p>
+      <p *ngIf="!modulesLoadError">No hay módulos disponibles para este negocio.</p>
+    </div>
+  </div>
+
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar class="ion-padding-horizontal">
+    <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 12px 0;">
+      <ion-button (click)="dismiss()" color="medium" fill="clear">
+        Cancelar
+      </ion-button>
+      <ion-button *ngIf="actorAdminPorDefecto || actorEsAdmin" 
+                  color="primary" 
+                  fill="solid" 
+                  shape="round"
+                  (click)="save()" 
+                  [disabled]="loading"
+                  style="min-width: 150px;">
+        <span *ngIf="!loading">Guardar Cambios</span>
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

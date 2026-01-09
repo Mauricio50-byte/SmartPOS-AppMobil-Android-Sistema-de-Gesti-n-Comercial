@@ -1,0 +1,244 @@
+<div class="dashboard-container">
+  <div class="grid-layout">
+    
+    <!-- Panel de Métricas Rápidas (Siempre visible arriba) -->
+    <div class="panel-area metrics-area">
+      <div class="metrics-grid">
+        <div class="metric-card" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+          <div class="metric-icon-wrapper income">
+            <ion-icon name="cash-outline"></ion-icon>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value">{{ totalIngresos | currency:'USD':'symbol':'1.0-0' }}</div>
+            <div class="metric-label">Ingresos Totales</div>
+            <div class="metric-trend positive" *ngIf="dataLoaded">
+              <ion-icon name="trending-up-outline"></ion-icon> <span>+12%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+          <div class="metric-icon-wrapper sales">
+            <ion-icon name="cart-outline"></ion-icon>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value">{{ totalVentas }}</div>
+            <div class="metric-label">Ventas Totales</div>
+            <div class="metric-trend positive" *ngIf="dataLoaded">
+              <ion-icon name="trending-up-outline"></ion-icon> <span>+5%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card" *ngIf="canAccess('VER_CLIENTES')">
+          <div class="metric-icon-wrapper clients">
+            <ion-icon name="people-outline"></ion-icon>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value">{{ nuevosClientes }}</div>
+            <div class="metric-label">Clientes Nuevos</div>
+            <div class="metric-trend neutral" *ngIf="dataLoaded">
+              <ion-icon name="remove-outline"></ion-icon> <span>=</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+          <div class="metric-icon-wrapper ticket">
+            <ion-icon name="pricetags-outline"></ion-icon>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value">{{ ticketPromedio | currency:'USD':'symbol':'1.0-0' }}</div>
+            <div class="metric-label">Ticket Promedio</div>
+            <div class="metric-trend positive" *ngIf="dataLoaded">
+              <ion-icon name="trending-up-outline"></ion-icon> <span>+2%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de Ventas Mensuales (Principal) -->
+    <div class="panel-card sales-chart-area" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+      <div class="panel-header">
+        <div class="header-info">
+          <h3 class="panel-title">Ventas Mensuales</h3>
+          <span class="panel-subtitle">Comportamiento anual</span>
+        </div>
+        <div class="filter-control">
+          <ion-select [value]="timeFilter" (ionChange)="onFilterChange($event)" interface="popover">
+            <ion-select-option value="week">Semana</ion-select-option>
+            <ion-select-option value="month">Mes</ion-select-option>
+            <ion-select-option value="year">Año</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+      <div class="panel-content chart-wrapper">
+        <div class="chart-container" *ngIf="ventasChartData && dataLoaded; else loading">
+          <canvas baseChart
+            [data]="ventasChartData"
+            [options]="barChartOptions"
+            [type]="barChartType">
+          </canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de Acciones Rápidas -->
+    <div class="panel-card actions-area">
+      <div class="panel-header">
+        <h3 class="panel-title">Acciones</h3>
+      </div>
+      <div class="panel-content actions-grid">
+        <ion-button class="action-btn" color="primary" (click)="onNavigate('ventas')" *ngIf="canAccess('CREAR_VENTA') || canAccess('VENDER')">
+          <div class="btn-content">
+            <ion-icon name="add-circle-outline"></ion-icon>
+            <span>Venta</span>
+          </div>
+        </ion-button>
+        <ion-button class="action-btn" color="secondary" (click)="onNavigate('productos')" *ngIf="canAccess('VER_INVENTARIO')">
+          <div class="btn-content">
+            <ion-icon name="cube-outline"></ion-icon>
+            <span>Productos</span>
+          </div>
+        </ion-button>
+        <ion-button class="action-btn" color="tertiary" (click)="onNavigate('clientes')" *ngIf="canAccess('CREAR_CLIENTE')">
+          <div class="btn-content">
+            <ion-icon name="person-add-outline"></ion-icon>
+            <span>Cliente</span>
+          </div>
+        </ion-button>
+        <ion-button class="action-btn" color="medium" (click)="onNavigate('reportes')" *ngIf="canAccess('VER_REPORTES')">
+          <div class="btn-content">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <span>Reportes</span>
+          </div>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Transacciones Recientes -->
+    <div class="panel-card transactions-area" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+      <div class="panel-header">
+        <h3 class="panel-title">Recientes</h3>
+        <span class="panel-subtitle">Últimas 5 ventas</span>
+      </div>
+      <div class="panel-content table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Total</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let venta of recentTransactions">
+              <td data-label="ID">#{{ venta.id }}</td>
+              <td data-label="Fecha">{{ venta.fecha | date:'shortDate' }}</td>
+              <td data-label="Total" class="amount">{{ venta.total | currency:'USD':'symbol':'1.0-0' }}</td>
+              <td data-label="Estado">
+                <span class="status-badge success">Ok</span>
+              </td>
+            </tr>
+            <tr *ngIf="recentTransactions.length === 0">
+              <td colspan="4" class="empty-text">Sin transacciones</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Alertas de Stock Bajo -->
+    <div class="panel-card low-stock-area" *ngIf="canAccess('VER_INVENTARIO')">
+      <div class="panel-header">
+        <h3 class="panel-title">Stock Bajo</h3>
+        <span class="panel-subtitle" *ngIf="lowStockProducts.length > 0">Atención requerida</span>
+      </div>
+      <div class="panel-content list-container">
+        <div class="stock-list" *ngIf="lowStockProducts.length > 0; else emptyStock">
+          <div class="stock-item" *ngFor="let p of lowStockProducts">
+            <div class="stock-info">
+              <div class="stock-name">{{ p.nombre }}</div>
+              <div class="stock-meta">Min: {{ p.stockMinimo || 5 }}</div>
+            </div>
+            <div class="stock-badge warning">
+              {{ p.stock }} unids.
+            </div>
+          </div>
+        </div>
+        <ng-template #emptyStock>
+          <div class="empty-state">
+            <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+            <span>Inventario Saludable</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Panel de Productos Más Vendidos -->
+    <div class="panel-card top-products-area" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+      <div class="panel-header">
+        <h3 class="panel-title">Top Productos</h3>
+      </div>
+      <div class="panel-content list-container">
+        <div class="top-product-list" *ngIf="topProducts.length > 0; else noProducts">
+          <div class="top-product-item" *ngFor="let p of topProducts; let i = index">
+            <div class="rank-badge">{{ i + 1 }}</div>
+            <div class="product-details">
+              <div class="product-name">{{ p.name }}</div>
+              <div class="product-bar-bg">
+                <div class="product-bar-fill" [style.width.%]="p.percentage"></div>
+              </div>
+            </div>
+            <div class="product-stats">
+              <div class="stat-qty">{{ p.qty }}</div>
+              <div class="stat-label">vendidos</div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noProducts>
+          <div class="empty-state">
+            <ion-icon name="stats-chart-outline"></ion-icon>
+            <span>Sin datos de ventas</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Paneles Distribución (Categoría y Pagos) -->
+    <div class="panel-card category-area" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+      <app-category-distribution
+        *ngIf="dataLoaded; else loading"
+        [ventas]="allVentas" 
+        [productos]="allProductos">
+      </app-category-distribution>
+    </div>
+
+    <div class="panel-card payment-area" *ngIf="canAccess('VER_VENTAS') || canAccess('VENDER')">
+      <app-payment-distribution
+        *ngIf="dataLoaded; else loading"
+        [ventas]="allVentas">
+      </app-payment-distribution>
+    </div>
+
+    <!-- Panel de Mejores Clientes -->
+    <div class="panel-card customers-area" *ngIf="(canAccess('VER_VENTAS') || canAccess('VENDER')) && canAccess('VER_CLIENTES')">
+      <app-top-customers
+        *ngIf="dataLoaded; else loading"
+        [ventas]="allVentas"
+        [clientes]="allClientes">
+      </app-top-customers>
+    </div>
+
+    <!-- Template de Carga -->
+    <ng-template #loading>
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Cargando...</span>
+      </div>
+    </ng-template>
+
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="panel top-customers-panel">
+  <div class="panel-header">
+    <div>
+      <h3 class="panel-title">Mejores Clientes</h3>
+      <span class="panel-subtitle">Top 5 por compras</span>
+    </div>
+  </div>
+  <div class="panel-content list-content">
+    <div class="customer-item" *ngFor="let customer of topCustomers; let i = index">
+      <div class="customer-rank">{{ i + 1 }}</div>
+      <div class="customer-info">
+        <div class="customer-name">{{ customer.name }}</div>
+        <div class="customer-stats">
+          {{ customer.transactionCount }} compras
+        </div>
+      </div>
+      <div class="customer-total">
+        {{ customer.totalSpent | currency:'USD':'symbol':'1.0-0' }}
+      </div>
+    </div>
+    
+    <div *ngIf="topCustomers.length === 0" class="empty-state">
+      <p>No hay datos disponibles</p>
+    </div>
+  </div>
+</div>

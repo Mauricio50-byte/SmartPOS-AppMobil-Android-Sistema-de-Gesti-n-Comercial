@@ -1,0 +1,128 @@
+.manual-card {
+  margin: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  border-radius: 12px;
+}
+
+.manual-content {
+  padding: 10px;
+}
+
+.manual-section {
+  margin-bottom: 20px;
+  
+  h3 {
+    color: var(--ion-color-primary);
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+  }
+
+  p {
+    color: var(--ion-color-medium-shade);
+    line-height: 1.5;
+  }
+}
+
+ion-accordion {
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+  border: 1px solid var(--ion-color-light);
+
+  ion-item {
+    --background: var(--ion-color-light-tint);
+    --padding-start: 16px;
+    font-weight: 500;
+    
+    ion-icon {
+      margin-right: 12px;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  .ion-padding {
+    padding: 16px;
+    background: #fff;
+    
+    p {
+      margin-top: 0;
+      color: var(--ion-color-dark);
+      line-height: 1.6;
+    }
+
+    ul, ol {
+      padding-left: 20px;
+      color: var(--ion-color-medium-shade);
+      
+      li {
+        margin-bottom: 8px;
+        line-height: 1.4;
+        
+        strong {
+          color: var(--ion-color-dark);
+        }
+      }
+    }
+  }
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 200px;
+  background-color: #f0f2f5;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  color: #888;
+  transition: all 0.3s ease;
+
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: #ccc;
+  }
+
+  span {
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  &:hover {
+    background-color: #e8eaf0;
+    border-color: var(--ion-color-primary);
+    color: var(--ion-color-primary);
+    
+    ion-icon {
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+/* Estilos para las imágenes reales del manual */
+.manual-image-container {
+  margin-top: 20px;
+  text-align: center;
+  
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid var(--ion-color-light);
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .image-caption {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+    font-style: italic;
+  }
+}

@@ -1,0 +1,86 @@
+<div class="filters-container">
+  <div class="search-wrapper">
+    <ion-searchbar placeholder="Buscar por nombre o SKU..." animated="true" debounce="500"
+      (ionInput)="onSearch($event)"></ion-searchbar>
+  </div>
+  
+  <div class="module-selector">
+    <ion-item lines="none" class="filter-item">
+      <ion-icon name="filter-outline" slot="start" color="medium"></ion-icon>
+      <ion-select [value]="selectedModule" (ionChange)="onModuleChange($event)" interface="popover" placeholder="Filtrar por Módulo">
+        <ion-select-option *ngFor="let mod of availableModules" [value]="mod.id">{{ mod.label }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </div>
+</div>
+
+<div class="table-container">
+  <table class="products-table">
+    <thead>
+      <tr>
+        <th *ngFor="let col of displayedColumns">{{ col.label }}</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of filteredProducts">
+        <td *ngFor="let col of displayedColumns" [attr.data-label]="col.label">
+          <ng-container [ngSwitch]="col.type">
+            <!-- Currency -->
+            <span *ngSwitchCase="'currency'">{{ getValue(product, col) | currency:'USD' }}</span>
+            
+            <!-- Date -->
+            <span *ngSwitchCase="'date'">{{ getValue(product, col) | date:'shortDate' }}</span>
+            
+            <!-- Badge (Estado) -->
+            <ion-badge *ngSwitchCase="'badge'" [color]="col.badgeColor ? col.badgeColor(getValue(product, col)) : 'primary'">
+              {{ getValue(product, col) ? 'Activo' : 'Inactivo' }}
+            </ion-badge>
+
+            <!-- Boolean -->
+            <span *ngSwitchCase="'boolean'">
+              <ion-icon [name]="getValue(product, col) ? 'checkmark-circle' : 'close-circle'" 
+                [color]="getValue(product, col) ? 'success' : 'medium'"></ion-icon>
+              {{ getValue(product, col) ? 'Sí' : 'No' }}
+            </span>
+
+            <!-- Default Text -->
+            <span *ngSwitchDefault>
+              <!-- Special case for Name to show SKU -->
+              <ng-container *ngIf="col.key === 'nombre'">
+                <strong>{{ product.nombre }}</strong>
+              </ng-container>
+
+              <!-- Special case for Stock -->
+              <ng-container *ngIf="col.key === 'stock'">
+                <span [class.low-stock-text]="isLowStock(product)">
+                  {{ getValue(product, col) || '0' }}
+                </span>
+              </ng-container>
+
+              <!-- Standard Text for other columns -->
+              <ng-container *ngIf="col.key !== 'nombre' && col.key !== 'stock'">
+                {{ getValue(product, col) || '-' }}
+              </ng-container>
+            </span>
+          </ng-container>
+        </td>
+        
+        <td class="actions" data-label="Acciones">
+          <ion-button fill="clear" size="small" (click)="onEdit(product)">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" (click)="onDelete(product)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </td>
+      </tr>
+      
+      <tr *ngIf="filteredProducts.length === 0">
+        <td [attr.colspan]="displayedColumns.length + 1" class="empty-cell">
+          No se encontraron productos con los filtros seleccionados.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,33 @@
+<div class="client-section">
+    <div class="client-header">
+        <h3>Cliente</h3>
+        <ion-button size="small" fill="clear" (click)="abrirRegistroCliente()">
+            <ion-icon slot="start" name="person-add-outline"></ion-icon>
+            Nuevo
+        </ion-button>
+    </div>
+
+    <!-- Cliente seleccionado -->
+    <div class="selected-client" *ngIf="clienteSeleccionado && !mostrarRegistroCliente">
+        <div class="client-info">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <div>
+                <strong>{{ clienteSeleccionado.nombre }}</strong>
+                <small *ngIf="clienteSeleccionado.telefono">{{ clienteSeleccionado.telefono }}</small>
+            </div>
+        </div>
+        <ion-button size="small" fill="clear" (click)="limpiarCliente()">
+            <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+    </div>
+
+    <!-- Selector de cliente existente -->
+    <div class="client-selector" *ngIf="!clienteSeleccionado && !mostrarRegistroCliente">
+        <ion-select placeholder="Seleccionar cliente" interface="action-sheet"
+            (ionChange)="seleccionarCliente($event.detail.value)">
+            <ion-select-option *ngFor="let cliente of clientes" [value]="cliente">
+                {{ cliente.nombre }} - {{ cliente.telefono }}
+            </ion-select-option>
+        </ion-select>
+    </div>
+</div>

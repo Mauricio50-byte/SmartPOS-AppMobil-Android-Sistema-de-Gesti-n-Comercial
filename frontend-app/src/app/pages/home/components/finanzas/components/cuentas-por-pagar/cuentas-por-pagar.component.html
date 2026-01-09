@@ -1,0 +1,105 @@
+<div class="toolbar">
+  <ion-button (click)="toggleForm()" color="primary">
+    <ion-icon slot="start" name="add-outline"></ion-icon>
+    Nuevo Gasto
+  </ion-button>
+  
+  <ion-searchbar placeholder="Buscar proveedor o concepto..." (ionInput)="onSearchChange($event)" class="search-bar"></ion-searchbar>
+  
+  <div class="filter-container">
+    <ion-select [value]="filterEstado" (ionChange)="onFilterChange($event)" interface="popover">
+      <ion-select-option value="PENDIENTE">Pendientes</ion-select-option>
+      <ion-select-option value="VENCIDO">Vencidos</ion-select-option>
+      <ion-select-option value="PAGADO">Pagados</ion-select-option>
+      <ion-select-option value="TODOS">Todos</ion-select-option>
+    </ion-select>
+  </div>
+</div>
+
+<!-- Formulario de Nuevo Gasto -->
+<div *ngIf="showForm" class="form-container fade-in">
+  <div class="form-card">
+    <h3>Registrar Nuevo Gasto</h3>
+    <form [formGroup]="gastoForm" (ngSubmit)="guardarGasto()">
+      <div class="form-grid">
+        <ion-item>
+          <ion-label position="stacked">Proveedor</ion-label>
+          <ion-input formControlName="proveedor" placeholder="Nombre del proveedor"></ion-input>
+        </ion-item>
+        
+        <ion-item>
+          <ion-label position="stacked">Concepto</ion-label>
+          <ion-input formControlName="concepto" placeholder="Descripción del gasto"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Monto Total</ion-label>
+          <ion-input type="number" formControlName="montoTotal" placeholder="0.00"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Fecha Vencimiento</ion-label>
+          <ion-input type="date" formControlName="fechaVencimiento"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Categoría</ion-label>
+          <ion-select formControlName="categoria">
+            <ion-select-option value="OPERATIVO">Operativo</ion-select-option>
+            <ion-select-option value="ADMINISTRATIVO">Administrativo</ion-select-option>
+            <ion-select-option value="FINANCIERO">Financiero</ion-select-option>
+            <ion-select-option value="OTROS">Otros</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+      
+      <div class="form-actions">
+        <ion-button type="button" fill="outline" color="medium" (click)="toggleForm()">Cancelar</ion-button>
+        <ion-button type="submit" [disabled]="gastoForm.invalid">Guardar</ion-button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Proveedor</th>
+        <th>Concepto</th>
+        <th>Fecha Registro</th>
+        <th>Vencimiento</th>
+        <th>Monto</th>
+        <th>Saldo</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let gasto of filteredGastos">
+        <td data-label="Proveedor"><strong>{{ gasto.proveedor }}</strong></td>
+        <td data-label="Concepto">{{ gasto.concepto }}</td>
+        <td data-label="Fecha Registro">{{ gasto.fechaRegistro | date:'shortDate' }}</td>
+        <td data-label="Vencimiento">{{ gasto.fechaVencimiento ? (gasto.fechaVencimiento | date:'shortDate') : '-' }}</td>
+        <td data-label="Monto">{{ gasto.montoTotal | currency:'USD' }}</td>
+        <td data-label="Saldo" class="amount-pending">{{ gasto.saldoPendiente | currency:'USD' }}</td>
+        <td data-label="Estado">
+          <ion-badge [color]="gasto.estado === 'PAGADO' ? 'success' : (gasto.estado === 'VENCIDO' ? 'danger' : 'warning')">
+            {{ gasto.estado }}
+          </ion-badge>
+        </td>
+        <td data-label="Acciones">
+          <ion-button *ngIf="gasto.estado !== 'PAGADO'" size="small" (click)="registrarPago(gasto)">
+            <ion-icon slot="start" name="cash-outline"></ion-icon>
+            Pagar
+          </ion-button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredGastos.length === 0">
+        <td colspan="8" class="empty-state">
+          No se encontraron gastos con los filtros seleccionados.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

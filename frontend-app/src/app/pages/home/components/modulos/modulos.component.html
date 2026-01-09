@@ -1,0 +1,65 @@
+<div class="header-container">
+  <h1>Gestión de Módulos</h1>
+  <p class="subtitle">Active o desactive las funcionalidades del sistema según su negocio</p>
+</div>
+
+<div class="loading-container" *ngIf="loading">
+  <ion-spinner name="crescent"></ion-spinner>
+  <p>Cargando módulos...</p>
+</div>
+
+<div class="content-container" *ngIf="!loading">
+  <!-- Módulos del Sistema -->
+  <div class="section-header">
+    <h2>Módulos del Sistema</h2>
+    <p>Funcionalidades base activas por defecto (No modificables)</p>
+  </div>
+  
+  <div class="modules-grid">
+    <div class="module-card system-card" *ngFor="let mod of modulosSistema">
+      <div class="card-header">
+        <div class="icon-wrapper">
+          <ion-icon name="cube" size="large"></ion-icon>
+        </div>
+        <ion-badge color="medium" mode="ios">BASE</ion-badge>
+      </div>
+      <div class="card-content">
+        <h3>{{ mod.nombre }}</h3>
+        <p>{{ mod.descripcion }}</p>
+      </div>
+      <div class="card-footer">
+        <span class="status-badge active">
+          ACTIVO
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Módulos de Negocio -->
+  <div class="section-header">
+    <h2>Módulos de Negocio</h2>
+    <p>Funcionalidades específicas que puede activar según su tipo de negocio</p>
+  </div>
+
+  <div class="modules-grid">
+    <div class="module-card" *ngFor="let mod of modulosNegocio" [class.active]="mod.activo">
+      <div class="card-header">
+        <div class="icon-wrapper">
+          <ion-icon [name]="mod.id === 'ropa' ? 'shirt' : mod.id === 'alimentos' ? 'restaurant' : 'briefcase'" size="large"></ion-icon>
+        </div>
+        <ion-toggle [checked]="mod.activo" (ionChange)="toggleModulo(mod)" color="success"></ion-toggle>
+      </div>
+      <div class="card-content">
+        <h3>{{ mod.nombre }}</h3>
+        <p>{{ mod.descripcion }}</p>
+      </div>
+      <div class="card-footer">
+        <span class="status-badge" [class.active]="mod.activo">
+          {{ mod.activo ? 'ACTIVO' : 'INACTIVO' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

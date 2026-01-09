@@ -1,0 +1,256 @@
+<ion-card class="manual-card">
+  <ion-card-header>
+    <ion-card-title>Manual de Usuario del Sistema POS</ion-card-title>
+    <ion-card-subtitle>Guía completa para la operación y administración</ion-card-subtitle>
+  </ion-card-header>
+  <ion-card-content>
+    <div class="manual-content">
+      
+      <!-- Introducción -->
+      <section class="manual-section">
+        <h3>1. Introducción</h3>
+        <p>Bienvenido al sistema SmartPOS. Este sistema integral le permite gestionar ventas, inventario, clientes y finanzas de manera eficiente. A continuación, se detalla el uso de cada módulo.</p>
+      </section>
+
+      <ion-accordion-group>
+        
+        <!-- Dashboard -->
+        <ion-accordion value="dashboard">
+          <ion-item slot="header" color="light">
+            <ion-icon name="home-outline" slot="start"></ion-icon>
+            <ion-label>2. Dashboard (Panel Principal)</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>El Dashboard es la pantalla de inicio que ofrece una vista rápida del estado de su negocio.</p>
+            <ul>
+              <li><strong>Resumen Diario:</strong> Muestra totales de ventas, ganancias y número de transacciones del día.</li>
+              <li><strong>Distribución por Categoría:</strong> Gráfico que muestra qué categorías de productos se venden más.</li>
+              <li><strong>Métodos de Pago:</strong> Desglose de ingresos por efectivo, tarjeta o transferencia.</li>
+              <li><strong>Top Clientes:</strong> Lista de los clientes más frecuentes.</li>
+            </ul>
+            <div class="manual-image-container">
+              <img src="assets/images/dashboard-manual.png" alt="Vista general del Dashboard" 
+                   (error)="dashboardImageError = true" [hidden]="dashboardImageError">
+              
+              <div class="image-placeholder" *ngIf="dashboardImageError">
+                <ion-icon name="image-outline"></ion-icon>
+                <span>Imagen no encontrada</span>
+                <small style="color: var(--ion-color-medium); margin-top: 5px;">
+                </small>
+              </div>
+
+              <p class="image-caption">Imagen: Vista general del Dashboard</p>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Ventas -->
+        <ion-accordion value="ventas">
+          <ion-item slot="header" color="light">
+            <ion-icon name="cart-outline" slot="start"></ion-icon>
+            <ion-label>3. Módulo de Ventas</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Este es el módulo principal para realizar transacciones.</p>
+            <ol>
+              <li><strong>Seleccionar Productos:</strong> Busque productos por nombre o escanee el código de barras. También puede navegar por las categorías.</li>
+              <li><strong>Carrito de Compras:</strong> A la derecha verá los items agregados. Puede ajustar cantidades o eliminar items.</li>
+              <li><strong>Seleccionar Cliente:</strong> (Opcional) Asigne la venta a un cliente registrado para seguimiento o crédito.</li>
+              <li><strong>Cobrar:</strong> Haga clic en el botón de cobrar.</li>
+              <li><strong>Método de Pago:</strong> Seleccione Efectivo, Tarjeta o Transferencia. Si es efectivo, ingrese el monto recibido para calcular el cambio.</li>
+            </ol>
+            <div class="image-placeholder">
+              <ion-icon name="image-outline"></ion-icon>
+              <img src ="assets/images/ventas-manual.png" alt="Pantalla de Ventas y Proceso de Cobro" 
+                  >
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Caja -->
+        <ion-accordion value="caja">
+          <ion-item slot="header" color="light">
+            <ion-icon name="cash-outline" slot="start"></ion-icon>
+            <ion-label>4. Gestión de Caja</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Control del flujo de efectivo diario y turnos.</p>
+            <ul>
+              <li><strong>Abrir Caja:</strong> Al inicio del día o turno, debe abrir caja indicando el monto inicial (base).</li>
+              <li><strong>Registrar Movimientos:</strong> Use "Registrar Ingreso" (entrada de dinero extra) o "Registrar Egreso" (gastos menores, pagos a proveedores) para movimientos que no son ventas.</li>
+              <li><strong>Cerrar Caja:</strong> Al finalizar, cierre la caja. El sistema mostrará un resumen de lo esperado vs. lo real.</li>
+            </ul>
+            <div class="image-placeholder">
+              <ion-icon name="image-outline"></ion-icon>
+              <img src ="assets/images/caja-manual.png" alt="Panel de Control de Caja" 
+                  >
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Productos -->
+        <ion-accordion value="productos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="pricetags-outline" slot="start"></ion-icon>
+            <ion-label>5. Productos e Inventario</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Gestione su catálogo de productos y stock.</p>
+            <ul>
+              <li><strong>Lista de Productos:</strong> Vea todos sus productos, filtre por categoría o busque por nombre.</li>
+              <li><strong>Agregar Producto:</strong> Presione el botón "+" para crear uno nuevo. Dependiendo de los módulos activos, verá formularios específicos (ej. Ropa con tallas/colores, Farmacia con fecha de vencimiento).</li>
+              <li><strong>Editar/Eliminar:</strong> Modifique precios, stock o descripciones de productos existentes.</li>
+              <li><strong>Control de Stock:</strong> El sistema descuenta automáticamente el inventario al realizar ventas.</li>
+            </ul>
+            <div class="manual-image-container">
+              <img src="assets/images/Productos-manual.png" alt="Lista de Productos" 
+                   (error)="productsImageError = true" [hidden]="productsImageError">
+              
+              <div class="image-placeholder" *ngIf="productsImageError">
+                 <!-- Fallback to SVG if PNG fails -->
+                 <img src="assets/images/Productos-manual.svg" alt="Esquema de Lista de Productos">
+              </div>
+
+              <img src="assets/images/crear-producto-manual.png" alt="Formulario de Creación de Producto" style="margin-top: 20px;"
+                   (error)="createProductImageError = true" [hidden]="createProductImageError">
+              
+              <div class="image-placeholder" *ngIf="createProductImageError" style="margin-top: 20px;">
+                 <img src="assets/images/crear-producto-manual.svg" alt="Esquema de Formulario de Producto">
+              </div>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Clientes -->
+        <ion-accordion value="clientes">
+          <ion-item slot="header" color="light">
+            <ion-icon name="people-outline" slot="start"></ion-icon>
+            <ion-label>6. Clientes</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Base de datos de sus compradores.</p>
+            <ul>
+              <li><strong>Registro:</strong> Guarde información de contacto (Nombre, Teléfono, Email, Dirección).</li>
+              <li><strong>Historial:</strong> Vea las compras pasadas de cada cliente.</li>
+              <li><strong>Créditos:</strong> Gestione los límites de crédito si su negocio ofrece fiado.</li>
+            </ul>
+            <div class="manual-image-container">
+              <img src="assets/images/clientes-manual.png" alt="Directorio de Clientes" 
+                   (error)="clientsImageError = true" [hidden]="clientsImageError">
+              
+              <div class="image-placeholder" *ngIf="clientsImageError">
+                <img src="assets/images/clientes-manual.svg" alt="Esquema de Clientes">
+              </div>
+              
+              <p class="image-caption">Imagen: Directorio de Clientes</p>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Finanzas -->
+        <ion-accordion value="finanzas">
+          <ion-item slot="header" color="light">
+            <ion-icon name="wallet-outline" slot="start"></ion-icon>
+            <ion-label>7. Finanzas</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Control de deudas y cuentas.</p>
+            <ul>
+              <li><strong>Cuentas por Cobrar:</strong> Lista de ventas a crédito pendientes de pago por parte de clientes. Permite registrar abonos.</li>
+              <li><strong>Cuentas por Pagar:</strong> Registro de deudas con proveedores o gastos pendientes.</li>
+            </ul>
+            <div class="manual-image-container">
+              <img src="assets/images/finanzas-manual.png" alt="Resumen Financiero"
+                   (error)="financeImageError = true" [hidden]="financeImageError">
+              
+              <div class="image-placeholder" *ngIf="financeImageError">
+                <img src="assets/images/finanzas-manual.svg" alt="Esquema de Finanzas">
+              </div>
+
+              <p class="image-caption">Imagen: Resumen Financiero</p>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Reportes -->
+        <ion-accordion value="reportes">
+          <ion-item slot="header" color="light">
+            <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
+            <ion-label>8. Reportes</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Análisis detallado del rendimiento.</p>
+            <ul>
+              <li>Genere reportes por rango de fechas.</li>
+              <li>Visualice ventas totales, ganancias netas y productos más vendidos.</li>
+              <li>Exportación de datos (si está disponible).</li>
+            </ul>
+            <div class="manual-image-container">
+              <img src="assets/images/reportes-manual.png" alt="Generación de Reportes"
+                   (error)="reportsImageError = true" [hidden]="reportsImageError">
+              
+              <div class="image-placeholder" *ngIf="reportsImageError">
+                <img src="assets/images/reportes-manual.svg" alt="Esquema de Reportes">
+              </div>
+
+              <p class="image-caption">Imagen: Generación de Reportes</p>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Gestión de Módulos -->
+        <ion-accordion value="modulos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="grid-outline" slot="start"></ion-icon>
+            <ion-label>9. Gestión de Módulos</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Personalice el sistema según su rubro.</p>
+            <p>Puede activar o desactivar módulos específicos como:</p>
+            <ul>
+              <li><strong>Ropa:</strong> Habilita campos de Talla y Color.</li>
+              <li><strong>Farmacia:</strong> Habilita campos de Lote y Vencimiento.</li>
+              <li><strong>Restaurante:</strong> (Si disponible) Funciones para mesas o pedidos.</li>
+            </ul>
+            <div class="manual-image-container">
+              <img src="assets/images/Modulos-manual.png" alt="Selector de Módulos Activos"
+                   (error)="modulesImageError = true" [hidden]="modulesImageError">
+              
+              <div class="image-placeholder" *ngIf="modulesImageError">
+                <img src="assets/images/Modulos-manual.svg" alt="Esquema de Módulos">
+              </div>
+
+              <p class="image-caption">Imagen: Selector de Módulos Activos</p>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Usuarios -->
+        <ion-accordion value="usuarios">
+          <ion-item slot="header" color="light">
+            <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+            <ion-label>10. Usuarios y Seguridad</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <p>Administración de acceso al sistema.</p>
+            <ul>
+              <li>Cree cuentas para sus empleados (Cajeros, Administradores).</li>
+              <li>Asigne roles para limitar el acceso a funciones sensibles (como Reportes o Configuración).</li>
+            </ul>
+            <div class="manual-image-container">
+              <img src="assets/images/usuarios-manual.png" alt="Lista de Usuarios"
+                   (error)="usersImageError = true" [hidden]="usersImageError">
+              
+              <div class="image-placeholder" *ngIf="usersImageError">
+                <img src="assets/images/usuarios-manual.svg" alt="Esquema de Usuarios">
+              </div>
+
+              <p class="image-caption">Imagen: Lista de Usuarios</p>
+            </div>
+          </div>
+        </ion-accordion>
+
+      </ion-accordion-group>
+    </div>
+  </ion-card-content>
+</ion-card>

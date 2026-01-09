@@ -1,0 +1,102 @@
+<div class="clientes-container">
+  <div class="clientes-header">
+    <h1>Gestión de Clientes</h1>
+    <p class="subtitle">Listado con filtros y estado de cuenta</p>
+  </div>
+
+  <div class="toolbar">
+    <ion-searchbar placeholder="Buscar cliente..." (ionInput)="onSearchChange($event)" class="search-bar"></ion-searchbar>
+    <div class="filter-container">
+      <ion-select [value]="filtroEstado" (ionChange)="onFilterChange($event)" interface="popover">
+        <ion-select-option value="TODOS">Todos</ion-select-option>
+        <ion-select-option value="CON_DEUDA">Con deuda</ion-select-option>
+        <ion-select-option value="SIN_DEUDA">Sin deuda</ion-select-option>
+      </ion-select>
+    </div>
+  </div>
+
+  <div class="table-container" *ngIf="!loading; else loadingTpl">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Cédula</th>
+          <th>Crédito Disp.</th>
+          <th>Saldo Deuda</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of filtrados">
+          <td data-label="Cliente">
+            <div class="client-info"><span class="name">{{ c.nombre }}</span></div>
+          </td>
+          <td data-label="Teléfono">{{ c.telefono || '-' }}</td>
+          <td data-label="Cédula">{{ c.cedula || '-' }}</td>
+          <td data-label="Crédito Disp.">{{ creditoDisponible(c) | currency:'USD' }}</td>
+          <td data-label="Saldo Deuda" class="amount-pending">{{ c.saldoDeuda || 0 | currency:'USD' }}</td>
+          <td data-label="Estado">
+            <ion-badge [color]="(c.saldoDeuda || 0) > 0 ? 'warning' : 'success'">
+              {{ (c.saldoDeuda || 0) > 0 ? 'Con deuda' : 'Sin deuda' }}
+            </ion-badge>
+            <ion-badge *ngIf="c.activo === false" color="medium" style="margin-left: 5px;">Inactivo</ion-badge>
+          </td>
+          <td data-label="Acciones">
+            <ion-button size="small" (click)="verEstado(c)" fill="clear" title="Ver Estado">
+              <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+            </ion-button>
+            <ion-button size="small" (click)="editarCliente(c)" color="secondary" fill="clear" title="Editar">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button size="small" (click)="toggleActivo(c)" [color]="c.activo === false ? 'success' : 'medium'" fill="clear" [title]="c.activo === false ? 'Activar' : 'Desactivar'">
+              <ion-icon slot="icon-only" name="power-outline"></ion-icon>
+            </ion-button>
+          </td>
+        </tr>
+        <tr *ngIf="filtrados.length === 0">
+          <td colspan="7" class="empty-state">No se encontraron clientes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading"><ion-spinner name="dots" color="primary"></ion-spinner></div>
+  </ng-template>
+
+  <div class="detalle-panel" *ngIf="seleccionado">
+    <div class="detalle-header">
+      <div class="title"><ion-icon name="person-outline"></ion-icon><strong>{{ seleccionado.nombre }}</strong></div>
+      <ion-button fill="clear" (click)="cerrarDetalle()"><ion-icon name="close-outline"></ion-icon></ion-button>
+    </div>
+    <div class="detalle-content" *ngIf="estadoCuenta; else cargandoDetalle">
+      <div class="resumen">
+        <div><span class="label">Crédito Máximo</span><span class="value">{{ estadoCuenta.cliente.creditoMaximo | currency:'USD' }}</span></div>
+        <div><span class="label">Saldo Deuda</span><span class="value">{{ estadoCuenta.cliente.saldoDeuda | currency:'USD' }}</span></div>
+        <div><span class="label">Crédito Disponible</span><span class="value">{{ estadoCuenta.creditoDisponible | currency:'USD' }}</span></div>
+      </div>
+      <div class="deudas-list">
+        <h3>Deudas</h3>
+        <table class="data-table mini">
+          <thead><tr><th>Fecha</th><th>Total</th><th>Saldo</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let d of estadoCuenta.deudas">
+              <td>{{ d.fechaCreacion | date:'shortDate' }}</td>
+              <td>{{ d.montoTotal | currency:'USD' }}</td>
+              <td>{{ d.saldoPendiente | currency:'USD' }}</td>
+              <td><ion-badge [color]="d.estado === 'PAGADO' ? 'success' : (d.estado === 'VENCIDO' ? 'danger' : 'warning')">{{ d.estado }}</ion-badge></td>
+            </tr>
+            <tr *ngIf="estadoCuenta.deudas.length === 0">
+              <td colspan="4" class="empty-state">Sin deudas registradas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <ng-template #cargandoDetalle>
+      <div class="loading"><ion-spinner name="dots" color="primary"></ion-spinner></div>
+    </ng-template>
+  </div>
+</div>

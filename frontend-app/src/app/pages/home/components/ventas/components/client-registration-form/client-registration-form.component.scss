@@ -1,0 +1,116 @@
+.quick-register {
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    .form-header {
+        margin-bottom: 1.5rem;
+        text-align: center;
+
+        h4 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            ion-icon {
+                font-size: 1.5rem;
+                color: var(--ion-color-primary);
+            }
+        }
+
+        p {
+            margin: 0.5rem 0 0;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+    }
+
+    .custom-item {
+        --padding-start: 0;
+        --inner-padding-end: 0;
+        --background: #f9fafb;
+        --border-radius: 8px;
+        margin-bottom: 0.5rem;
+        border: 1px solid transparent;
+        transition: all 0.2s;
+
+        &:focus-within {
+            --background: #ffffff;
+            border-color: var(--ion-color-primary);
+            box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb), 0.1);
+        }
+
+        ion-icon {
+            margin: 0 8px 0 12px;
+            font-size: 1.2rem;
+        }
+
+        ion-label {
+            font-weight: 500;
+            color: #4b5563 !important;
+            font-size: 0.85rem !important;
+            margin-bottom: 4px;
+        }
+
+        ion-input {
+            --padding-start: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+    }
+
+    .error-msg {
+        color: var(--ion-color-danger);
+        font-size: 0.75rem;
+        margin-top: -4px;
+        margin-bottom: 8px;
+        margin-left: 4px;
+    }
+
+    .section-divider {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+        color: #9ca3af;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+
+        &::before, &::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        span {
+            padding: 0 1rem;
+        }
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f3f4f6;
+
+        ion-button {
+            --border-radius: 8px;
+            margin: 0;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+    }
+}

@@ -1,0 +1,32 @@
+<div class="products-wrapper">
+    <div class="products-header">
+        <ion-segment [value]="segment" (ionChange)="segmentChanged($event)" color="tertiary">
+            <ion-segment-button value="info">
+                <ion-label>Información de Inventario</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="gestion">
+                <ion-label>Gestión de Productos</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </div>
+
+    <div class="products-content">
+        <div *ngIf="segment === 'info'" class="info-view fade-in">
+            <app-productos-lista 
+                [products]="products" 
+                [modulosActivos]="modulosActivos"
+                (edit)="onEdit($event)" 
+                (delete)="onDelete($event)">
+            </app-productos-lista>
+        </div>
+
+        <div *ngIf="segment === 'gestion'" class="gestion-view fade-in">
+            <app-productos-form 
+                [product]="selectedProduct" 
+                [modulosActivos]="modulosActivos"
+                (save)="onSave($event)"
+                (cancelled)="onCancel()">
+            </app-productos-form>
+        </div>
+    </div>
+</div>

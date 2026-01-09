@@ -1,0 +1,17 @@
+<div [formGroup]="parentForm" class="form-section">
+    <h3>Detalles de Servicio</h3>
+    <div class="two-columns">
+        <ion-item class="input-item">
+            <ion-label position="stacked">Duración (min)</ion-label>
+            <ion-input type="number" formControlName="duracion"></ion-input>
+        </ion-item>
+        <ion-item class="input-item">
+            <ion-label position="stacked">Responsable</ion-label>
+            <ion-input formControlName="responsable" placeholder="Nombre del encargado"></ion-input>
+        </ion-item>
+    </div>
+    <ion-item lines="none" class="toggle-item">
+        <ion-label>Requiere Cita</ion-label>
+        <ion-toggle slot="end" formControlName="requiereCita"></ion-toggle>
+    </ion-item>
+</div>

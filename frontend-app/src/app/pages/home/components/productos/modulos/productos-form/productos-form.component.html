@@ -1,0 +1,155 @@
+<div class="form-card">
+    <h2>{{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <!-- TIPO DE ITEM -->
+        <div class="form-section tipo-section">
+            <h3>Tipo de Producto</h3>
+
+            <ion-item class="input-item">
+                <ion-label position="stacked">Seleccione el tipo de producto *</ion-label>
+                <ion-select formControlName="tipo" placeholder="Seleccionar tipo">
+                    <ion-select-option value="GENERAL">General</ion-select-option>
+                    <ion-select-option value="ROPA" *ngIf="isModuleActive('ropa')">Ropa y Accesorios</ion-select-option>
+                    <ion-select-option value="ALIMENTO" *ngIf="isModuleActive('alimentos')">Alimentos y
+                        Perecederos</ion-select-option>
+                    <ion-select-option value="SERVICIO" *ngIf="isModuleActive('servicios')">Servicios</ion-select-option>
+                    <ion-select-option value="FARMACIA" *ngIf="isModuleActive('farmacia')">Farmacia</ion-select-option>
+                    <ion-select-option value="PAPELERIA" *ngIf="isModuleActive('papeleria')">Papelería</ion-select-option>
+                    <ion-select-option value="RESTAURANTE" *ngIf="isModuleActive('restaurante')">Restaurante</ion-select-option>
+                </ion-select>
+            </ion-item>
+        </div>
+
+        <!-- IDENTIFICACIÓN -->
+        <div class="form-section">
+            <h3>Identificación</h3>
+
+            <ion-item class="input-item">
+                <ion-label position="stacked">Nombre del Producto *</ion-label>
+                <ion-input formControlName="nombre"
+                    placeholder="Ej. Camisa Polo, Manzanas, Corte de Cabello"></ion-input>
+            </ion-item>
+            <div class="error-msg" *ngIf="productForm.get('nombre')?.touched && productForm.get('nombre')?.invalid">
+                El nombre es requerido (min 3 caracteres).
+            </div>
+
+            <ion-item class="input-item">
+                <ion-label position="stacked">SKU / Código Interno</ion-label>
+                <ion-input formControlName="sku" placeholder="Ej. CAM-001"></ion-input>
+            </ion-item>
+        </div>
+
+        <!-- DESCRIPCIÓN -->
+        <div class="form-section">
+            <h3>Descripción</h3>
+            <ion-item class="input-item">
+                <ion-label position="stacked">Descripción</ion-label>
+                <ion-textarea formControlName="descripcion" rows="3"></ion-textarea>
+            </ion-item>
+            <ion-item class="input-item">
+                <ion-label position="stacked">Imagen del Producto (Opcional)</ion-label>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" #fileInput hidden>
+                <ion-button expand="block" fill="outline" (click)="fileInput.click()" class="ion-margin-top">
+                    <ion-icon name="camera" slot="start"></ion-icon>
+                    Seleccionar Imagen
+                </ion-button>
+                <div *ngIf="previewImage || productForm.get('imagen')?.value" class="ion-margin-top ion-text-center">
+                    <img [src]="previewImage || productForm.get('imagen')?.value" style="max-height: 200px; border-radius: 8px;">
+                    <ion-button fill="clear" color="danger" (click)="removeImage()">
+                        <ion-icon name="trash" slot="start"></ion-icon>
+                        Quitar Imagen
+                    </ion-button>
+                </div>
+            </ion-item>
+        </div>
+
+        <!-- SUB-COMPONENTES POR MÓDULO -->
+        <app-formulario-ropa *ngIf="productForm.get('tipo')?.value === 'ROPA'" [parentForm]="productForm">
+        </app-formulario-ropa>
+
+        <app-formulario-alimentos *ngIf="productForm.get('tipo')?.value === 'ALIMENTO'" [parentForm]="productForm">
+        </app-formulario-alimentos>
+
+        <app-formulario-servicios *ngIf="productForm.get('tipo')?.value === 'SERVICIO'" [parentForm]="productForm">
+        </app-formulario-servicios>
+
+        <app-formulario-farmacia *ngIf="productForm.get('tipo')?.value === 'FARMACIA'" [parentForm]="productForm">
+        </app-formulario-farmacia>
+
+        <app-formulario-papeleria *ngIf="productForm.get('tipo')?.value === 'PAPELERIA'" [parentForm]="productForm">
+        </app-formulario-papeleria>
+
+        <app-formulario-restaurante *ngIf="productForm.get('tipo')?.value === 'RESTAURANTE'" [parentForm]="productForm">
+        </app-formulario-restaurante>
+
+        <!-- CATEGORIZACIÓN -->
+        <div class="form-section">
+            <h3>Categorización</h3>
+            <ion-item class="input-item">
+                <ion-label position="stacked">Categoría</ion-label>
+                <ion-input formControlName="categoria"></ion-input>
+            </ion-item>
+            <ion-item class="input-item">
+                <ion-label position="stacked">Marca</ion-label>
+                <ion-input formControlName="marca"></ion-input>
+            </ion-item>
+        </div>
+
+        <!-- PRECIOS Y COSTOS -->
+        <div class="form-section">
+            <h3>Precios y Costos</h3>
+            <div class="two-columns">
+                <ion-item class="input-item">
+                    <ion-label position="stacked">Precio Costo</ion-label>
+                    <ion-input type="number" formControlName="precioCosto"></ion-input>
+                </ion-item>
+                <ion-item class="input-item">
+                    <ion-label position="stacked">Precio Venta *</ion-label>
+                    <ion-input type="number" formControlName="precioVenta"></ion-input>
+                </ion-item>
+            </div>
+            <ion-item class="input-item">
+                <ion-label position="stacked">IVA (%)</ion-label>
+                <ion-input type="number" formControlName="iva"></ion-input>
+            </ion-item>
+        </div>
+
+        <!-- INVENTARIO -->
+        <div class="form-section" *ngIf="productForm.get('tipo')?.value !== 'SERVICIO'">
+            <h3>Inventario</h3>
+            <div class="two-columns">
+                <ion-item class="input-item">
+                    <ion-label position="stacked">Stock Actual *</ion-label>
+                    <ion-input type="number" formControlName="stock"></ion-input>
+                </ion-item>
+                <ion-item class="input-item">
+                    <ion-label position="stacked">Stock Mínimo</ion-label>
+                    <ion-input type="number" formControlName="stockMinimo"></ion-input>
+                </ion-item>
+            </div>
+            <ion-item class="input-item">
+                <ion-label position="stacked">Unidad de Medida</ion-label>
+                <ion-input formControlName="unidadMedida"
+                    placeholder="Ej. Unidad, Caja, Paquete, Kg, Litro"></ion-input>
+            </ion-item>
+        </div>
+
+        <!-- ESTADO -->
+        <div class="form-section">
+            <ion-item lines="none" class="toggle-item">
+                <ion-label>Producto Activo</ion-label>
+                <ion-toggle slot="end" formControlName="activo"></ion-toggle>
+            </ion-item>
+        </div>
+
+        <div class="form-actions">
+            <ion-button type="button" fill="outline" color="medium" (click)="onCancel()">
+                Cancelar
+            </ion-button>
+            <ion-button type="submit" [disabled]="productForm.invalid">
+                {{ isEditing ? 'Actualizar' : 'Guardar' }}
+            </ion-button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,41 @@
+<div [formGroup]="parentForm" class="form-section">
+    <h3>Detalles de Farmacia</h3>
+    <div class="two-columns">
+        <ion-item class="input-item">
+            <ion-label position="stacked">Componente Activo</ion-label>
+            <ion-input formControlName="componenteActivo" placeholder="Ej. Acetaminofén"></ion-input>
+        </ion-item>
+        <ion-item class="input-item">
+            <ion-label position="stacked">Laboratorio</ion-label>
+            <ion-input formControlName="laboratorio" placeholder="Ej. MK, Genfar"></ion-input>
+        </ion-item>
+    </div>
+    <div class="two-columns">
+        <ion-item class="input-item">
+            <ion-label position="stacked">Presentación</ion-label>
+            <ion-input formControlName="presentacion" placeholder="Ej. Tableta, Jarabe"></ion-input>
+        </ion-item>
+        <ion-item class="input-item">
+            <ion-label position="stacked">Dosis</ion-label>
+            <ion-input formControlName="dosis" placeholder="Ej. 500mg"></ion-input>
+        </ion-item>
+    </div>
+    <div class="two-columns">
+        <ion-item class="input-item">
+            <ion-label position="stacked">Fecha Vencimiento</ion-label>
+            <ion-input type="date" formControlName="fechaVencimiento"></ion-input>
+        </ion-item>
+        <ion-item class="input-item">
+            <ion-label position="stacked">Lote</ion-label>
+            <ion-input formControlName="lote"></ion-input>
+        </ion-item>
+    </div>
+    <ion-item class="input-item">
+        <ion-label position="stacked">Registro Invima</ion-label>
+        <ion-input formControlName="registroInvima"></ion-input>
+    </ion-item>
+    <ion-item lines="none" class="toggle-item">
+        <ion-label>Requiere Receta</ion-label>
+        <ion-toggle slot="end" formControlName="requiereReceta"></ion-toggle>
+    </ion-item>
+</div>

@@ -1,0 +1,62 @@
+<ion-content class="login-wrapper" fullscreen>
+  <div class="viewport">
+    <div class="container">
+    <div class="brand">
+      <div class="brand-icon"><ion-icon name="checkmark-outline"></ion-icon></div>
+      <div class="brand-name">SmartPOS</div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate aria-label="Formulario de inicio de sesión">
+      <h1 class="title">Iniciar sesión</h1>
+
+      <ion-item class="input-item" lines="none">
+        <ion-icon slot="start" name="person-outline"></ion-icon>
+        <ion-input type="email" inputmode="email" autocomplete="email" formControlName="email" aria-required="true" placeholder="Correo"></ion-input>
+      </ion-item>
+      <div class="error" *ngIf="f['email'].touched && f['email'].invalid">
+        <span *ngIf="f['email'].errors?.['required']">El correo es obligatorio.</span>
+        <span *ngIf="f['email'].errors?.['email']">Formato de correo inválido.</span>
+      </div>
+
+      <ion-item class="input-item" lines="none">
+        <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          autocomplete="current-password"
+          formControlName="password"
+          aria-required="true"
+          placeholder="Contraseña"
+          autocapitalize="off"
+          spellcheck="false"
+          [maxlength]="64"
+          (keydown)="onPasswordKeyEvent($event)"
+          (keyup)="onPasswordKeyEvent($event)"
+        ></ion-input>
+        <ion-button fill="clear" slot="end" (click)="togglePassword()" aria-label="Mostrar u ocultar contraseña">
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <div class="error" *ngIf="f['password'].touched && f['password'].invalid" aria-live="polite">
+        <span *ngIf="f['password'].errors?.['required']">La contraseña es obligatoria.</span>
+        <span *ngIf="f['password'].errors?.['minlength']">Mínimo 6 caracteres.</span>
+        <span *ngIf="f['password'].errors?.['invalid']">Credenciales inválidas.</span>
+      </div>
+      <div class="error" *ngIf="capsLockOn" aria-live="polite">Caps Lock activado.</div>
+
+      <ion-item lines="none" class="remember-row">
+        <ion-checkbox formControlName="remember" aria-label="Recordar credenciales"></ion-checkbox>
+        <ion-label>Recordar credenciales</ion-label>
+      </ion-item>
+
+      <div class="actions">
+        <ion-button type="submit" expand="block" [disabled]="form.invalid">Iniciar Sesión</ion-button>
+        <a class="forgot" href="#" aria-label="Recuperar contraseña">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <div class="offline" *ngIf="(online$ | async) === false" role="status">
+        Sin conexión. El inicio de sesión requiere conexión al servidor.
+      </div>
+    </form>
+    </div>
+  </div>
+</ion-content>

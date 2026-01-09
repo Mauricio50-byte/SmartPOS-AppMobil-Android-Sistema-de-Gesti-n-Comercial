@@ -1,0 +1,147 @@
+<div class="sales-wrapper">
+  
+  <div class="sales-container">
+    <!-- Panel de Catálogo (Siempre visible en desktop, visible atrás en móvil) -->
+    <div class="catalog-panel">
+      <div class="catalog-header">
+        <div class="search-bar">
+          <ion-searchbar 
+            placeholder="Buscar productos..." 
+            [(ngModel)]="searchTerm"
+            (ionInput)="onSearch($event)"
+            mode="ios"
+            showCancelButton="focus">
+          </ion-searchbar>
+        </div>
+      </div>
+
+      <div class="product-grid" *ngIf="filteredProductos.length > 0; else noProducts">
+        <app-product-card 
+          *ngFor="let product of filteredProductos" 
+          [product]="product" 
+          (add)="addToCart($event)">
+        </app-product-card>
+      </div>
+
+      <ng-template #noProducts>
+        <div class="empty-state">
+          <ion-icon name="search-outline"></ion-icon>
+          <p>No se encontraron productos.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Panel de Ticket/Carrito (Sidebar en Desktop, Overlay en Móvil) -->
+    <div class="ticket-panel" [class.mobile-visible]="cartVisibleMobile">
+      
+      <!-- Header del Carrito (Solo Móvil) -->
+      <div class="cart-mobile-header">
+        <h2>Carrito de Compra</h2>
+        <ion-button fill="clear" (click)="toggleCartMobile()">
+          <ion-icon name="chevron-down-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="ticket-content-scroll">
+        <!-- Selector de Tipo de Venta -->
+        <div class="sale-type-selector">
+          <ion-segment [(ngModel)]="tipoVenta" (ionChange)="setTipoVenta($event.detail.value)" mode="ios">
+            <ion-segment-button value="CONTADO">
+              <ion-label>Contado</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="FIADO">
+              <ion-label>Fiado</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- Selector de Cliente -->
+        <div class="client-section">
+          <app-client-selector 
+            [clientes]="clientes" 
+            [clienteSeleccionado]="clienteSeleccionado"
+            [mostrarRegistroCliente]="mostrarRegistroCliente" 
+            (clienteSeleccionadoChange)="onClienteSeleccionado($event)"
+            (nuevoClienteClick)="mostrarModalRegistroCliente()">
+          </app-client-selector>
+
+          <app-client-registration-form 
+            *ngIf="mostrarRegistroCliente" 
+            [datosClienteGroup]="datosClienteGroup"
+            (cancelar)="cancelarRegistroCliente()" 
+            (guardar)="registrarNuevoCliente($event)">
+          </app-client-registration-form>
+        </div>
+
+        <!-- Lista de productos -->
+        <div class="cart-items-header">
+          <span>Items ({{ detalles.length }})</span>
+          <ion-button fill="clear" size="small" color="danger" (click)="detalles.clear(); calculateTotal()" *ngIf="detalles.length > 0">
+            Limpiar
+          </ion-button>
+        </div>
+
+        <div class="cart-list">
+          <app-cart-item 
+            *ngFor="let control of detalles.controls; let i = index" 
+            [item]="control.value"
+            (remove)="removeFromCart(i)" 
+            (updateQuantity)="updateQuantity($event, i)">
+          </app-cart-item>
+
+          <div class="empty-cart" *ngIf="detalles.length === 0">
+            <ion-icon name="cart-outline"></ion-icon>
+            <p>Su carrito está vacío</p>
+            <ion-button fill="outline" size="small" (click)="toggleCartMobile()" class="ion-hide-md-up">
+              Ir al Catálogo
+            </ion-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer con total y pago -->
+      <div class="ticket-footer">
+        <div class="subtotal">
+          <span class="label">Total a Pagar</span>
+          <span class="amount">{{ totalControl.value | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+
+        <app-payment-selector 
+          [selectedMethod]="paymentMethodControl.value"
+          (selectedMethodChange)="setPaymentMethod($event)">
+        </app-payment-selector>
+
+        <ion-button 
+          expand="block" 
+          [color]="tipoVenta === 'FIADO' ? 'warning' : 'primary'" 
+          class="pay-button"
+          (click)="pagar()" 
+          [disabled]="detalles.length === 0">
+          <ion-icon slot="start" [name]="tipoVenta === 'FIADO' ? 'time-outline' : 'checkmark-circle-outline'"></ion-icon>
+          {{ tipoVenta === 'FIADO' ? 'Registrar Deuda' : 'Confirmar Venta' }}
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar Flotante (Solo Móvil) -->
+  <div class="mobile-bottom-bar" *ngIf="!cartVisibleMobile">
+    <div class="cart-summary" (click)="toggleCartMobile()">
+      <div class="cart-info">
+        <div class="badge-count">
+          <ion-icon name="cart"></ion-icon>
+          <span *ngIf="detalles.length > 0">{{ detalles.length }}</span>
+        </div>
+        <div class="total-preview">
+          <span class="label">Total:</span>
+          <span class="value">{{ totalControl.value | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+      <ion-button size="small" fill="solid" color="light" class="view-cart-btn">
+        Ver Carrito
+        <ion-icon name="chevron-up-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+</div>

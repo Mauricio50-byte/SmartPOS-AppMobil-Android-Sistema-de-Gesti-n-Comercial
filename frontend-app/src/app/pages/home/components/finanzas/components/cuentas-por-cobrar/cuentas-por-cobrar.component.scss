@@ -1,0 +1,146 @@
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+
+  .search-bar {
+    flex: 1;
+    --background: #f4f5f8;
+    --border-radius: 8px;
+    --box-shadow: none;
+  }
+
+  .filter-container {
+    min-width: 150px;
+    
+    ion-select {
+      background: #f4f5f8;
+      border-radius: 8px;
+      padding: 10px;
+      --padding-start: 10px;
+    }
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+  
+  .data-table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    
+    th {
+      text-align: left;
+      padding: 12px;
+      color: var(--ion-color-medium);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-bottom: 2px solid #f4f5f8;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #f4f5f8;
+      vertical-align: middle;
+      font-size: 0.95rem;
+    }
+
+    .client-info {
+      display: flex;
+      flex-direction: column;
+      
+      .name {
+        font-weight: 500;
+      }
+      
+      .cedula {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+      }
+    }
+
+    .amount-pending {
+      font-weight: 600;
+      color: var(--ion-color-danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    overflow: visible;
+  }
+
+  .data-table {
+    min-width: 100% !important;
+    display: block;
+
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: block;
+      width: 100%;
+    }
+
+    tr {
+      display: block;
+      background: white;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid #e0e0e0;
+    }
+
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0 !important;
+      border: none !important;
+      text-align: right;
+      border-bottom: 1px solid #f5f5f5 !important;
+
+      &:last-child {
+        border-bottom: none !important;
+        justify-content: flex-end;
+        padding-top: 12px !important;
+      }
+
+      &:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--ion-color-medium);
+        margin-right: 16px;
+        text-align: left;
+        font-size: 0.9rem;
+      }
+    }
+    
+    // Hide empty state row styling special case
+    tr:has(.empty-state) {
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        
+        td {
+            display: table-cell;
+            text-align: center;
+            
+            &:before {
+                display: none;
+            }
+        }
+    }
+  }
+}
