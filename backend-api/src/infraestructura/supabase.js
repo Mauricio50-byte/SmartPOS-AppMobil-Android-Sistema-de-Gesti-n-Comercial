@@ -11,6 +11,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 })
 
 // Check connection (optional simple query)
+console.log('Connecting to Supabase at:', SUPABASE_URL);
 supabase.from('usuario').select('count', { count: 'exact', head: true })
   .then(({ error }) => {
     if (error) console.error('Error connecting to Supabase:', error.message)

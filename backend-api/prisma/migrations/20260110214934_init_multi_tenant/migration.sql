@@ -8,7 +8,6 @@ CREATE TABLE "Usuario" (
     "creadoEn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "negocioId" INTEGER,
     "authUserId" UUID,
-    "adminPorDefecto" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Usuario_pkey" PRIMARY KEY ("id")
 );

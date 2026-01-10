@@ -6,7 +6,6 @@ export interface UsuarioPerfil {
   permisos: string[];
   negocioId?: number | null;
   modulos?: string[];
-  adminPorDefecto?: boolean;
 }
 
 export interface Usuario {

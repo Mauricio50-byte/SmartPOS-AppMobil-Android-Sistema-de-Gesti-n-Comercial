@@ -7,7 +7,9 @@ async function registrarRutasUsuario(app) {
     if (!datos.negocioId && req.user && req.user.negocioId) {
       datos.negocioId = req.user.negocioId
     }
-    const usuario = await crearUsuario(datos)
+    // Pass the creator ID (adminId)
+    const adminId = req.user?.id;
+    const usuario = await crearUsuario(datos, adminId)
     return usuario
   })
 

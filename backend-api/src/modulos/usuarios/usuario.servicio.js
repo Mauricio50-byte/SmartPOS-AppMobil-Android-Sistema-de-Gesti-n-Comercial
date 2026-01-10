@@ -1,5 +1,5 @@
 const { prisma } = require('../../infraestructura/bd')
-const { ADMIN_CORREO } = require('../../configuracion/entorno')
+// const { ADMIN_CORREO } = require('../../configuracion/entorno')
 const bcrypt = require('bcryptjs')
 const { supabase } = require('../../infraestructura/supabase')
 
@@ -81,9 +81,11 @@ async function activarUsuario(id) {
 
 async function desactivarUsuario(id) {
   const usuario = await prisma.usuario.findUnique({ where: { id } })
+  /*
   if (usuario && usuario.correo === ADMIN_CORREO) {
     throw new Error('No se puede desactivar el usuario administrador principal')
   }
+  */
   return prisma.usuario.update({ where: { id }, data: { activo: false }, select: { id: true, activo: true } })
 }
 
@@ -92,9 +94,11 @@ async function eliminarUsuario(id) {
   if (!usuario) {
     throw new Error('Usuario no encontrado')
   }
+  /*
   if (usuario.correo === ADMIN_CORREO) {
     throw new Error('No se puede eliminar el usuario administrador principal')
   }
+  */
 
   // Verificar si tiene ventas (Restricción de FK)
   const ventas = await prisma.venta.count({ where: { usuarioId: id } })
@@ -121,9 +125,7 @@ async function asignarRolesAUsuario(id, roles = []) {
   return { id }
 }
 
-// ... (other functions remain same until crearUsuario)
-
-async function crearUsuario(datos) {
+async function crearUsuario(datos, adminId = null) {
   // 1. Create user in Supabase Auth
   // This triggers 'handle_new_user' in Postgres which creates the 'Usuario' record
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -202,6 +204,18 @@ async function crearUsuario(datos) {
         })
       }
     }
+  }
+
+  // Log Audit
+  if (adminId) {
+      await prisma.auditLog.create({
+          data: {
+              usuarioId: adminId, // The admin who performed the action
+              negocioId: usuario.negocioId,
+              accion: 'CREAR_USUARIO',
+              detalle: `Creación de usuario: ${usuario.nombre} (${usuario.correo}) con rol ${datos.rol || 'TRABAJADOR'}`
+          }
+      })
   }
 
   return obtenerUsuarioPorId(usuario.id)

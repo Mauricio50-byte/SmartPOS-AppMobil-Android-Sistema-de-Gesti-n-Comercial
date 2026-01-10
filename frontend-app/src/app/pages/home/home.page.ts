@@ -49,13 +49,13 @@ export class HomePage implements OnInit {
   hasPermission(permiso: string): boolean {
     if (!this.currentUser) return false;
     // Superuser has all permissions implicitly
-    if (this.currentUser.adminPorDefecto === true) return true;
+    if (this.currentUser.roles?.includes('ADMIN')) return true;
     return this.currentUser.permisos ? this.currentUser.permisos.includes(permiso) : false;
   }
 
   hasModule(modulo: string): boolean {
     if (!this.currentUser) return false;
-    if (this.currentUser.adminPorDefecto === true) return true;
+    if (this.currentUser.roles?.includes('ADMIN')) return true;
     return this.currentUser.modulos ? this.currentUser.modulos.includes(modulo) : false;
   }
 

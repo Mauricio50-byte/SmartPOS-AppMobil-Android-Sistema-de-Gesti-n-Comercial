@@ -1,5 +1,5 @@
 const { prisma } = require('./bd')
-const { ADMIN_CORREO, ADMIN_PASSWORD } = require('../configuracion/entorno')
+// const { ADMIN_CORREO, ADMIN_PASSWORD } = require('../configuracion/entorno')
 const bcrypt = require('bcryptjs')
 
 async function asegurarPermisosYAdmin() {
@@ -168,7 +168,9 @@ async function asegurarPermisosYAdmin() {
      }
   }
 
-  // 7. Crear/Actualizar Usuario Admin Principal
+  // 7. (DEPRECATED) Crear/Actualizar Usuario Admin Principal
+  // La lógica de admin por defecto se ha eliminado en favor del modelo multi-tenant donde cada negocio tiene su propio admin.
+  /*
   if (ADMIN_CORREO) {
       const passwordHash = await bcrypt.hash(ADMIN_PASSWORD || 'admin123', 10)
       
@@ -225,6 +227,7 @@ async function asegurarPermisosYAdmin() {
           })
       }
   }
+  */
 }
 
 module.exports = { asegurarPermisosYAdmin }

@@ -16,7 +16,6 @@ model Usuario {
   creadoEn        DateTime         @default(now())
   negocioId       Int?
   authUserId      String?          @unique @db.Uuid // Linked to Supabase Auth
-  adminPorDefecto Boolean          @default(false)
   logs            AuditLog[]
   pagosGastos     PagoGasto[]
   negocio         Negocio?         @relation(fields: [negocioId], references: [id])

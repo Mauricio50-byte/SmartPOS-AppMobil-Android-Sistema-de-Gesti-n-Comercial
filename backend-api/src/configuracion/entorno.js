@@ -13,16 +13,16 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'sb_s
 const DATABASE_URL = process.env.DATABASE_URL
 const DIRECT_URL = process.env.DIRECT_URL
 
-const ADMIN_CORREO = process.env.ADMIN_CORREO || 'admin@sistema-pos.local'
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'
+// const ADMIN_CORREO = process.env.ADMIN_CORREO || 'admin@sistema-pos.local'
+// const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'
 
 module.exports = { 
   PUERTO, 
   JWT_SECRETO, 
   DATABASE_URL,
   DIRECT_URL,
-  ADMIN_CORREO, 
-  ADMIN_PASSWORD,
+  // ADMIN_CORREO, 
+  // ADMIN_PASSWORD,
   SUPABASE_URL,
   SUPABASE_KEY,
   SUPABASE_SERVICE_ROLE_KEY

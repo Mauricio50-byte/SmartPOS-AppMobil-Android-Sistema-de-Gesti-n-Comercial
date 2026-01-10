@@ -44,12 +44,12 @@ export class RegisterPage implements OnInit {
     // Send metadata to Supabase Auth
     // The backend trigger handle_new_user() will catch this metadata
     const registerData = {
-      email,
+      email: email.trim(),
       password,
       options: {
         data: {
-          business_name: businessName,
-          full_name: fullName
+          business_name: businessName.trim(),
+          full_name: fullName.trim()
         }
       }
     };
@@ -68,9 +68,9 @@ export class RegisterPage implements OnInit {
       },
       error: async (err: any) => {
         this.isLoading = false;
-        console.error('Registration error:', err);
+        console.error('Registration error details:', JSON.stringify(err, null, 2));
         const toast = await this.toastController.create({
-          message: 'Error en el registro. ' + (err.error?.msg || 'Intente nuevamente.'),
+          message: 'Error en el registro. ' + (err.error?.mensaje || err.error?.message || err.message || 'Intente nuevamente.'),
           duration: 3000,
           color: 'danger',
           position: 'bottom'

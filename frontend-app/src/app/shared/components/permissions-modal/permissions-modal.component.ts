@@ -33,7 +33,6 @@ export class PermissionsModalComponent implements OnInit {
   modulosNegocio: Modulo[] = [];
   selectedModules: string[] = [];
 
-  actorAdminPorDefecto = false;
   actorEsAdmin = false;
   
   loading = false;
@@ -51,7 +50,6 @@ export class PermissionsModalComponent implements OnInit {
   ngOnInit() {
     this.authService.getPerfil$().subscribe(p => {
       console.log('Perfil del actor actual:', p);
-      this.actorAdminPorDefecto = p?.adminPorDefecto === true;
       this.actorEsAdmin = Array.isArray(p?.roles) ? p!.roles.includes('ADMIN') : false;
       this.updateVisiblePermissions();
       // Si no es admin, no debería estar aquí, pero por si acaso

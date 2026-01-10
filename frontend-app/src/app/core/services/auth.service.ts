@@ -71,7 +71,7 @@ export class AuthService implements OnDestroy {
     if (!perfil) return false;
     
     // Admin global
-    if (perfil.adminPorDefecto && perfil.roles?.includes('ADMIN')) return true;
+    if (perfil.roles?.includes('ADMIN')) return true;
     
     // Permiso explícito
     return perfil.permisos?.includes(clave) || false;

@@ -54,13 +54,12 @@ async function iniciar() {
     await req.jwtVerify(); 
     const permisos = req.user?.permisos || []; 
     const roles = req.user?.roles || [];
-    const adminPorDefecto = req.user?.adminPorDefecto === true
     // Si el usuario tiene el rol de ADMIN, le damos paso libre (o verificamos si la clave es 'ADMIN' específicamente)
-    if ((roles.includes('ADMIN') && adminPorDefecto) || permisos.includes(clave)) {
+    if (roles.includes('ADMIN') || permisos.includes(clave)) {
         return;
     }
     // Caso especial: si se pide permiso 'ADMIN', verificamos si tiene el ROL 'ADMIN'
-    if (clave === 'ADMIN' && roles.includes('ADMIN') && adminPorDefecto) {
+    if (clave === 'ADMIN' && roles.includes('ADMIN')) {
         return;
     }
     
@@ -71,10 +70,9 @@ async function iniciar() {
   app.decorate('requiereModulo', (moduloId) => async (req, res) => {
     await req.jwtVerify();
     const roles = req.user?.roles || [];
-    const adminPorDefecto = req.user?.adminPorDefecto === true
     
     // El administrador principal tiene acceso a todos los módulos activos del negocio
-    if (roles.includes('ADMIN') && adminPorDefecto) return;
+    if (roles.includes('ADMIN')) return;
 
     const modulos = req.user?.modulos || [];
     if (!modulos.includes(moduloId)) {
