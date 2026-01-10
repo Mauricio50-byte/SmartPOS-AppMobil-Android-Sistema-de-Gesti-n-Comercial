@@ -8,6 +8,14 @@ async function registrarRutasAuth(app) {
   // Nuevo endpoint de registro público
   app.post('/auth/registrar', async (req, res) => {
     const { email, password, options } = req.body || {}
+    
+    // Verificar si el usuario ya existe en nuestra base de datos (para evitar errores de triggers)
+    const existeUsuario = await prisma.usuario.findUnique({ where: { correo: email } })
+    if (existeUsuario) {
+      res.code(400)
+      return { mensaje: 'El correo ya está registrado en el sistema.' }
+    }
+
     try {
       const { user, session } = await registrar({ email, password, options })
       // Si hay sesión (login automático), devolver token
@@ -70,6 +78,14 @@ async function registrarRutasAuth(app) {
       if (!(roles.includes('ADMIN') && adminPorDefecto)) { res.code(403); throw new Error('No autorizado') }
     }
     const { nombre, correo, password } = req.body || {}
+    
+    // Verificar duplicados
+    const existe = await prisma.usuario.findUnique({ where: { correo } })
+    if (existe) {
+      res.code(400)
+      throw new Error('El correo ya está registrado en el sistema')
+    }
+
     const creado = await crearAdministrador({ nombre, correo, password })
     res.code(201)
     return { id: creado.id }
@@ -77,6 +93,13 @@ async function registrarRutasAuth(app) {
 
   app.post('/auth/registrar-usuario', { preHandler: [app.requierePermiso('CREAR_USUARIO')] }, async (req, res) => {
     const { nombre, correo, password, roles = [] } = req.body || {}
+    
+    // Verificar si el usuario ya existe
+    const existe = await prisma.usuario.findUnique({ where: { correo } })
+    if (existe) {
+      res.code(400)
+      throw new Error('El correo ya está registrado en el sistema')
+    }
     
     // Obtener negocioId del usuario actual
     // Nota: req.user viene del token decodificado.
