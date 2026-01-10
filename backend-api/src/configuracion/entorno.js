@@ -12,9 +12,9 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'sb_s
 // Assuming password provided 'SmartPOS AppMobil Android' needs URL encoding if it contains spaces.
 // NOTE: Ideally user should provide the exact connection string. I will construct it based on provided info.
 // Project ID: lczrzowgimhtwvpsuagi
-const DB_PASSWORD_RAW = 'SmartPOS AppMobil Android'
+const DB_PASSWORD_RAW = 'SmartPOS_AppMobil_Android'
 const DB_PASSWORD = encodeURIComponent(DB_PASSWORD_RAW)
-const DATABASE_URL = process.env.DATABASE_URL || `postgresql://postgres:${DB_PASSWORD}@db.lczrzowgimhtwvpsuagi.supabase.co:5432/postgres`
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:SmartPOS_AppMobil_Android@aws-1-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true'
 
 const ADMIN_CORREO = process.env.ADMIN_CORREO || 'admin@sistema-pos.local'
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'
