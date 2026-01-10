@@ -1,10 +1,11 @@
 const { prisma } = require('../../infraestructura/bd')
 
-async function abrirCaja({ usuarioId, montoInicial, observaciones }) {
+async function abrirCaja({ usuarioId, montoInicial, observaciones, negocioId }) {
   // Verificar si ya tiene una caja abierta
   const cajaAbierta = await prisma.caja.findFirst({
     where: {
       usuarioId,
+      negocioId,
       estado: 'ABIERTA'
     }
   })
@@ -20,6 +21,7 @@ async function abrirCaja({ usuarioId, montoInicial, observaciones }) {
 
   const nuevaCaja = await prisma.caja.create({
     data: {
+      negocioId,
       usuarioId,
       montoInicial: monto,
       estado: 'ABIERTA',
@@ -28,16 +30,14 @@ async function abrirCaja({ usuarioId, montoInicial, observaciones }) {
     }
   })
 
-  // Registrar movimiento inicial de apertura si es > 0 (opcional, pero buena práctica)
-  // O simplemente el montoInicial es el saldo inicial.
-  
   return nuevaCaja
 }
 
-async function cerrarCaja({ usuarioId, montoFinal, observaciones }) {
+async function cerrarCaja({ usuarioId, montoFinal, observaciones, negocioId }) {
   const caja = await prisma.caja.findFirst({
     where: {
       usuarioId,
+      negocioId,
       estado: 'ABIERTA'
     },
     include: {
@@ -97,12 +97,12 @@ async function cerrarCaja({ usuarioId, montoFinal, observaciones }) {
   return cajaCerrada
 }
 
-async function registrarMovimiento({ usuarioId, cajaId, tipo, monto, descripcion, ventaId, gastoId, abonoId, metodoPago = 'EFECTIVO' }) {
+async function registrarMovimiento({ usuarioId, cajaId, tipo, monto, descripcion, ventaId, gastoId, abonoId, metodoPago = 'EFECTIVO', negocioId }) {
   // Si no se pasa cajaId, buscar la caja abierta del usuario
   let idCaja = cajaId
   if (!idCaja) {
     const caja = await prisma.caja.findFirst({
-      where: { usuarioId, estado: 'ABIERTA' }
+      where: { usuarioId, negocioId, estado: 'ABIERTA' }
     })
     if (!caja) {
       // Si no hay caja abierta, simplemente no registramos el movimiento en caja
@@ -122,6 +122,7 @@ async function registrarMovimiento({ usuarioId, cajaId, tipo, monto, descripcion
 
   const movimiento = await prisma.movimientoCaja.create({
     data: {
+      negocioId,
       cajaId: idCaja,
       usuarioId,
       tipo, // INGRESO, EGRESO, VENTA, PAGO_GASTO
@@ -138,9 +139,9 @@ async function registrarMovimiento({ usuarioId, cajaId, tipo, monto, descripcion
   return movimiento
 }
 
-async function obtenerEstadoCaja(usuarioId) {
+async function obtenerEstadoCaja(usuarioId, negocioId) {
   const caja = await prisma.caja.findFirst({
-    where: { usuarioId, estado: 'ABIERTA' },
+    where: { usuarioId, negocioId, estado: 'ABIERTA' },
     include: {
       movimientos: {
         orderBy: { fecha: 'desc' }
@@ -184,8 +185,8 @@ async function obtenerEstadoCaja(usuarioId) {
   }
 }
 
-async function obtenerHistorial({ usuarioId, fechaInicio, fechaFin }) {
-  const where = {}
+async function obtenerHistorial({ usuarioId, fechaInicio, fechaFin, negocioId }) {
+  const where = { negocioId }
   if (usuarioId) where.usuarioId = parseInt(usuarioId)
   
   if (fechaInicio || fechaFin) {
@@ -201,7 +202,7 @@ async function obtenerHistorial({ usuarioId, fechaInicio, fechaFin }) {
   })
 }
 
-async function obtenerEstadisticas({ fechaInicio, fechaFin }) {
+async function obtenerEstadisticas({ fechaInicio, fechaFin, negocioId }) {
   // Estadísticas globales (no por caja individual)
   // Ventas por día, etc. se pueden sacar de Venta, pero aquí nos enfocamos en flujo de caja.
   
@@ -214,6 +215,7 @@ async function obtenerEstadisticas({ fechaInicio, fechaFin }) {
   // Vamos a devolver resumen de cajas cerradas en el periodo
   const cajas = await prisma.caja.findMany({
     where: {
+      negocioId,
       fechaCierre: {
         gte: fechaInicio ? new Date(fechaInicio) : undefined,
         lte: fechaFin ? new Date(fechaFin) : undefined

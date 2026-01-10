@@ -12,9 +12,9 @@ async function listarClientes(filtro = {}) {
   })
 }
 
-async function obtenerClientePorId(id) {
-  return prisma.cliente.findUnique({
-    where: { id },
+async function obtenerClientePorId(id, negocioId) {
+  return prisma.cliente.findFirst({
+    where: { id, negocioId },
     include: {
       deudas: {
         where: { estado: { in: ['PENDIENTE', 'VENCIDO'] } },
@@ -28,9 +28,9 @@ async function obtenerClientePorId(id) {
   })
 }
 
-async function obtenerEstadoCuentaCliente(id) {
-  const cliente = await prisma.cliente.findUnique({
-    where: { id },
+async function obtenerEstadoCuentaCliente(id, negocioId) {
+  const cliente = await prisma.cliente.findFirst({
+    where: { id, negocioId },
     include: {
       deudas: {
         where: { estado: { in: ['PENDIENTE', 'VENCIDO'] } },
@@ -61,23 +61,24 @@ async function obtenerEstadoCuentaCliente(id) {
   }
 }
 
-async function crearCliente(datos) {
+async function crearCliente(datos, negocioId) {
   const { nombre, correo, telefono, cedula, direccion, creditoMaximo = 0, diasCredito = 30 } = datos
 
   // Validar que no exista cliente con la misma cédula si se proporciona
   if (cedula) {
-    const existe = await prisma.cliente.findUnique({ where: { cedula } })
-    if (existe) throw new Error('Ya existe un cliente con esta cédula')
+    const existe = await prisma.cliente.findFirst({ where: { cedula, negocioId } })
+    if (existe) throw new Error('Ya existe un cliente con esta cédula en este negocio')
   }
 
   // Validar que no exista cliente con el mismo correo si se proporciona
   if (correo) {
-    const existeCorreo = await prisma.cliente.findUnique({ where: { correo } })
-    if (existeCorreo) throw new Error('Ya existe un cliente con este correo')
+    const existeCorreo = await prisma.cliente.findFirst({ where: { correo, negocioId } })
+    if (existeCorreo) throw new Error('Ya existe un cliente con este correo en este negocio')
   }
 
   return prisma.cliente.create({
     data: {
+      negocioId,
       nombre,
       correo: correo || null, // Convertir '' a null para evitar error de unique
       telefono,
@@ -89,7 +90,10 @@ async function crearCliente(datos) {
   })
 }
 
-async function actualizarCliente(id, datos) {
+async function actualizarCliente(id, datos, negocioId) {
+  const existe = await prisma.cliente.findFirst({ where: { id, negocioId } })
+  if (!existe) throw new Error('Cliente no encontrado')
+
   const campos = {}
   if (datos.nombre) campos.nombre = datos.nombre
   if (datos.correo !== undefined) campos.correo = datos.correo
@@ -104,7 +108,10 @@ async function actualizarCliente(id, datos) {
   return prisma.cliente.update({ where: { id }, data: campos })
 }
 
-async function eliminarCliente(id) {
+async function eliminarCliente(id, negocioId) {
+  const existe = await prisma.cliente.findFirst({ where: { id, negocioId } })
+  if (!existe) throw new Error('Cliente no encontrado')
+
   // Verificar que no tenga deudas pendientes
   const deudas = await prisma.deuda.count({
     where: {
@@ -120,8 +127,8 @@ async function eliminarCliente(id) {
   return prisma.cliente.delete({ where: { id } })
 }
 
-async function validarCreditoDisponible(clienteId, montoNuevo) {
-  const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } })
+async function validarCreditoDisponible(clienteId, montoNuevo, negocioId) {
+  const cliente = await prisma.cliente.findFirst({ where: { id: clienteId, negocioId } })
   if (!cliente) throw new Error('Cliente no encontrado')
 
   const creditoDisponible = cliente.creditoMaximo - cliente.saldoDeuda

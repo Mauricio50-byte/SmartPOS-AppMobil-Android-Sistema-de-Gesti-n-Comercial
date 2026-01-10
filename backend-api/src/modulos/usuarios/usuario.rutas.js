@@ -33,6 +33,12 @@ async function registrarRutasUsuario(app) {
       }
     }
     if (typeof activo !== 'undefined') filtro.activo = activo === 'true'
+    
+    // Filtrar por negocio
+    if (req.user && req.user.negocioId) {
+      filtro.negocioId = req.user.negocioId
+    }
+
     const datos = await listarUsuarios(filtro)
     return res.send(datos)
   })

@@ -7,8 +7,9 @@ async function registrarRutasCaja(app) {
   }, async (req, res) => {
     const { montoInicial, observaciones } = req.body
     const usuarioId = req.user.id
+    const negocioId = req.user.negocioId
     try {
-      const caja = await cajaServicio.abrirCaja({ usuarioId, montoInicial, observaciones })
+      const caja = await cajaServicio.abrirCaja({ usuarioId, montoInicial, observaciones, negocioId })
       return caja
     } catch (error) {
       console.error('Error al abrir caja:', error)
@@ -22,8 +23,9 @@ async function registrarRutasCaja(app) {
   }, async (req, res) => {
     const { montoFinal, observaciones } = req.body
     const usuarioId = req.user.id
+    const negocioId = req.user.negocioId
     try {
-      const caja = await cajaServicio.cerrarCaja({ usuarioId, montoFinal, observaciones })
+      const caja = await cajaServicio.cerrarCaja({ usuarioId, montoFinal, observaciones, negocioId })
       return caja
     } catch (error) {
       console.error('Error al cerrar caja:', error)
@@ -37,12 +39,14 @@ async function registrarRutasCaja(app) {
   }, async (req, res) => {
     const { tipo, monto, descripcion } = req.body // tipo: INGRESO, EGRESO
     const usuarioId = req.user.id
+    const negocioId = req.user.negocioId
     try {
       const movimiento = await cajaServicio.registrarMovimiento({ 
         usuarioId, 
         tipo, 
         monto, 
-        descripcion 
+        descripcion,
+        negocioId
       })
       return movimiento
     } catch (error) {
@@ -56,7 +60,8 @@ async function registrarRutasCaja(app) {
     preHandler: [app.requierePermiso('ABRIR_CAJA')] // O permiso básico
   }, async (req, res) => {
     const usuarioId = req.user.id
-    const estado = await cajaServicio.obtenerEstadoCaja(usuarioId)
+    const negocioId = req.user.negocioId
+    const estado = await cajaServicio.obtenerEstadoCaja(usuarioId, negocioId)
     if (!estado) {
       // Retornar null en lugar de 404 para evitar errores en consola,
       // ya que "sin caja" es un estado válido.
@@ -70,7 +75,8 @@ async function registrarRutasCaja(app) {
     preHandler: [app.requierePermiso('VER_HISTORIAL_CAJA')]
   }, async (req, res) => {
     const { fechaInicio, fechaFin, usuarioId } = req.query
-    return await cajaServicio.obtenerHistorial({ fechaInicio, fechaFin, usuarioId })
+    const negocioId = req.user.negocioId
+    return await cajaServicio.obtenerHistorial({ fechaInicio, fechaFin, usuarioId, negocioId })
   })
   
   // Estadísticas (Admin o Finanzas)
@@ -78,7 +84,8 @@ async function registrarRutasCaja(app) {
     preHandler: [app.requierePermiso('VER_ESTADISTICAS_CAJA')]
   }, async (req, res) => {
     const { fechaInicio, fechaFin } = req.query
-    return await cajaServicio.obtenerEstadisticas({ fechaInicio, fechaFin })
+    const negocioId = req.user.negocioId
+    return await cajaServicio.obtenerEstadisticas({ fechaInicio, fechaFin, negocioId })
   })
 }
 

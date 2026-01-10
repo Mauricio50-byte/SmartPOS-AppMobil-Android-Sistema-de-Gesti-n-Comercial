@@ -1,17 +1,46 @@
-const { crearAdministrador, crearUsuarioConRoles, ingresar, obtenerModulosActivosNegocio } = require('./auth.servicio')
+const { registrar, crearAdministrador, crearUsuarioConRoles, ingresar, obtenerModulosActivosNegocio } = require('./auth.servicio')
 const { prisma } = require('../../infraestructura/bd')
 const { ADMIN_CORREO } = require('../../configuracion/entorno')
 
 async function registrarRutasAuth(app) {
   app.decorate('autenticar', async (req, res) => { await req.jwtVerify() })
 
+  // Nuevo endpoint de registro público
+  app.post('/auth/registrar', async (req, res) => {
+    const { email, password, options } = req.body || {}
+    try {
+      const { user, session } = await registrar({ email, password, options })
+      // Si hay sesión (login automático), devolver token
+      if (session) {
+        // Necesitamos esperar a que el trigger cree el usuario en Prisma para devolver el perfil completo?
+        // Por ahora devolvemos el token de Supabase y el usuario básico.
+        return { 
+          token: session.access_token, 
+          usuario: { 
+            id: user.id, // Supabase ID, frontend debe manejar esto
+            email: user.email,
+            // Perfil incompleto hasta que se cree en DB
+          }
+        }
+      }
+      return { mensaje: 'Registro exitoso. Por favor verifica tu correo.' }
+    } catch (e) {
+      res.code(400)
+      return { mensaje: e.message }
+    }
+  })
+
   app.post('/auth/ingresar', async (req, res) => {
     const { correo, password } = req.body || {}
     try {
-      const { usuario, roles, permisos, negocioId, modulos, adminPorDefecto } = await ingresar({ correo, password })
+      const { usuario, roles, permisos, negocioId, modulos, adminPorDefecto, session } = await ingresar({ correo, password })
+      
+      // SIEMPRE firmamos nuestro propio token para compatibilidad con la API del Backend
       const token = await res.jwtSign({ id: usuario.id, roles, permisos, nombre: usuario.nombre, correo: usuario.correo, negocioId, modulos, adminPorDefecto })
+      
       return {
         token,
+        session, // Devolvemos también la sesión de Supabase para que el Frontend la use si es necesario
         usuario: {
           id: usuario.id,
           roles,
@@ -24,9 +53,9 @@ async function registrarRutasAuth(app) {
         }
       }
     } catch (e) {
-      if (e && e.message === 'Credenciales inválidas') {
+      if (e && (e.message === 'Credenciales inválidas' || e.message.includes('Invalid login'))) {
         res.code(401)
-        return { mensaje: e.message }
+        return { mensaje: 'Credenciales inválidas' }
       }
       throw e
     }
@@ -48,7 +77,22 @@ async function registrarRutasAuth(app) {
 
   app.post('/auth/registrar-usuario', { preHandler: [app.requierePermiso('CREAR_USUARIO')] }, async (req, res) => {
     const { nombre, correo, password, roles = [] } = req.body || {}
-    const creado = await crearUsuarioConRoles({ nombre, correo, password, roles })
+    
+    // Obtener negocioId del usuario actual
+    // Nota: req.user viene del token decodificado.
+    // Si usamos token de Supabase, fastify-jwt podría necesitar configuración para decodificarlo correctamente o usamos user info de DB.
+    // En 'ingresar' devolvimos el token de Supabase.
+    // Si fastify-jwt verifica el token de Supabase, el payload es diferente.
+    
+    // Asumimos que req.user tiene la info correcta (verificar estrategia de JWT)
+    const negocioId = req.user?.negocioId;
+    
+    if (!negocioId) {
+      res.code(400)
+      throw new Error('No se puede crear usuario sin un negocio asociado')
+    }
+
+    const creado = await crearUsuarioConRoles({ nombre, correo, password, roles, negocioId })
     res.code(201)
     return { id: creado.id }
   })

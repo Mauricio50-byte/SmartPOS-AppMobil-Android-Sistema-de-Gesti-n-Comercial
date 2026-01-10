@@ -45,6 +45,18 @@ export class AuthService implements OnDestroy {
     );
   }
 
+  register(data: any): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/registrar`, data).pipe(
+      tap((resp: any) => {
+        // Automatically login after register if backend returns token, or just return success
+        if (resp && resp.token) {
+          this.setToken(resp.token);
+          if (resp.usuario) this.perfil$.next(resp.usuario);
+        }
+      })
+    );
+  }
+
   fetchPerfil(): Observable<UsuarioPerfil> {
     return this.http.get<{ usuario: UsuarioPerfil }>(`${environment.apiUrl}/auth/perfil`).pipe(
       tap(({ usuario }) => this.perfil$.next(usuario)),

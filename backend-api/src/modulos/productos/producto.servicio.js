@@ -7,21 +7,22 @@ const baseInclude = {
   detalleServicio: true
 }
 
-async function listarProductos() {
+async function listarProductos(negocioId) {
   return prisma.producto.findMany({
+    where: { negocioId },
     orderBy: { id: 'asc' },
     include: baseInclude
   })
 }
 
-async function obtenerProductoPorId(id) {
-  return prisma.producto.findUnique({
-    where: { id },
+async function obtenerProductoPorId(id, negocioId) {
+  return prisma.producto.findFirst({
+    where: { id, negocioId },
     include: baseInclude
   })
 }
 
-async function crearProducto(datos) {
+async function crearProducto(datos, negocioId) {
   const {
     nombre, sku, descripcion, imagen, categoria, subcategoria, marca,
     precioCosto, precioVenta, descuento, stock, stockMinimo, unidadMedida,
@@ -33,6 +34,7 @@ async function crearProducto(datos) {
     // 1. Crear el producto base
     const producto = await tx.producto.create({
       data: {
+        negocioId, // Vincular al negocio
         nombre,
         sku,
         descripcion,
@@ -67,7 +69,7 @@ async function crearProducto(datos) {
   })
 }
 
-async function actualizarProducto(id, datos) {
+async function actualizarProducto(id, datos, negocioId) {
   const {
     nombre, sku, descripcion, imagen, categoria, subcategoria, marca,
     precioCosto, precioVenta, descuento, stock, stockMinimo, unidadMedida,
@@ -76,6 +78,10 @@ async function actualizarProducto(id, datos) {
   } = datos
 
   return prisma.$transaction(async (tx) => {
+    // Verificar propiedad
+    const existe = await tx.producto.findFirst({ where: { id, negocioId } })
+    if (!existe) throw new Error('Producto no encontrado o no pertenece al negocio')
+
     // 1. Actualizar datos base
     const producto = await tx.producto.update({
       where: { id },
@@ -96,13 +102,11 @@ async function actualizarProducto(id, datos) {
         iva,
         proveedor,
         activo,
-        // No permitimos cambiar el tipo fácilmente por ahora, pero si se requiere:
-        // tipo
+        // No permitimos cambiar el tipo fácilmente por ahora
       }
     })
 
     // 2. Actualizar detalles específicos
-    // Usamos el tipo del producto actual o el nuevo si se envió
     const tipoProducto = tipo || producto.tipo
     const plugin = obtenerPlugin(tipoProducto)
     
@@ -117,10 +121,10 @@ async function actualizarProducto(id, datos) {
   })
 }
 
-async function eliminarProducto(id) {
-  // El borrado en cascada de la BD debería encargarse de los detalles
-  // Pero si no, deberíamos borrar manualmente.
-  // Con @relation(onDelete: Cascade) en Prisma schema, es automático.
+async function eliminarProducto(id, negocioId) {
+  const existe = await prisma.producto.findFirst({ where: { id, negocioId } })
+  if (!existe) throw new Error('Producto no encontrado o no pertenece al negocio')
+
   return prisma.producto.delete({ where: { id } })
 }
 

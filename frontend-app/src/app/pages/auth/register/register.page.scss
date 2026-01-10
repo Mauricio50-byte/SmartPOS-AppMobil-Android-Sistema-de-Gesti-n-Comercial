@@ -1,0 +1,136 @@
+// Copiando estilos base del Login para consistencia
+.login-wrapper {
+  --background: #f3f4f6;
+  height: 100%;
+}
+
+.viewport {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  padding: 40px 32px;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .brand-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3);
+
+    ion-icon {
+      font-size: 32px;
+      color: white;
+    }
+  }
+
+  .brand-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.025em;
+    margin-bottom: 4px;
+  }
+
+  .brand-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+}
+
+.section-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #9ca3af;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 16px 0 8px;
+  padding-left: 4px;
+}
+
+.input-item {
+  --background: #f9fafb;
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --inner-padding-end: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+
+  &.item-has-focus {
+    border-color: #0d9488;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+  }
+
+  ion-icon {
+    color: #9ca3af;
+    margin-right: 8px;
+  }
+
+  ion-input {
+    --placeholder-color: #9ca3af;
+    --color: #111827;
+    font-weight: 500;
+  }
+}
+
+.error {
+  color: #ef4444;
+  font-size: 12px;
+  margin: -8px 0 12px 4px;
+  display: block;
+}
+
+.actions {
+  margin-top: 32px;
+
+  ion-button {
+    --background: #0d9488;
+    --background-hover: #0f766e;
+    --background-activated: #0f766e;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.4);
+    height: 48px;
+    font-weight: 600;
+    font-size: 16px;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 16px;
+  }
+
+  .login-link {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+
+    a {
+      color: #0d9488;
+      font-weight: 600;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

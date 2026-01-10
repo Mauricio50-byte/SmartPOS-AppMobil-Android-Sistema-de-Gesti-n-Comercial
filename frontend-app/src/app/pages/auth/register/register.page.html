@@ -1,0 +1,69 @@
+<ion-content class="login-wrapper" fullscreen>
+  <div class="viewport">
+    <div class="container">
+      <div class="brand">
+        <div class="brand-icon"><ion-icon name="storefront-outline"></ion-icon></div>
+        <div class="brand-name">SmartPOS</div>
+        <div class="brand-subtitle">Registro de Negocio</div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="register-form">
+        
+        <!-- Sección Negocio -->
+        <div class="section-title">Datos del Negocio</div>
+        
+        <ion-item class="input-item" lines="none">
+          <ion-icon slot="start" name="briefcase-outline"></ion-icon>
+          <ion-input type="text" formControlName="businessName" placeholder="Nombre de tu Negocio" aria-label="Nombre del Negocio"></ion-input>
+        </ion-item>
+        <div class="error" *ngIf="f['businessName'].touched && f['businessName'].invalid">
+          <span *ngIf="f['businessName'].errors?.['required']">El nombre del negocio es obligatorio.</span>
+        </div>
+
+        <!-- Sección Usuario -->
+        <div class="section-title">Datos del Administrador</div>
+
+        <ion-item class="input-item" lines="none">
+          <ion-icon slot="start" name="person-outline"></ion-icon>
+          <ion-input type="text" formControlName="fullName" placeholder="Tu Nombre Completo" aria-label="Nombre Completo"></ion-input>
+        </ion-item>
+        <div class="error" *ngIf="f['fullName'].touched && f['fullName'].invalid">
+          <span *ngIf="f['fullName'].errors?.['required']">Tu nombre es obligatorio.</span>
+        </div>
+
+        <ion-item class="input-item" lines="none">
+          <ion-icon slot="start" name="mail-outline"></ion-icon>
+          <ion-input type="email" formControlName="email" placeholder="Correo Electrónico" aria-label="Correo"></ion-input>
+        </ion-item>
+        <div class="error" *ngIf="f['email'].touched && f['email'].invalid">
+          <span *ngIf="f['email'].errors?.['required']">El correo es obligatorio.</span>
+          <span *ngIf="f['email'].errors?.['email']">Formato inválido.</span>
+        </div>
+
+        <ion-item class="input-item" lines="none">
+          <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+          <ion-input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Contraseña" aria-label="Contraseña"></ion-input>
+          <ion-button fill="clear" slot="end" (click)="togglePassword()">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <div class="error" *ngIf="f['password'].touched && f['password'].invalid">
+          <span *ngIf="f['password'].errors?.['required']">Contraseña requerida.</span>
+          <span *ngIf="f['password'].errors?.['minlength']">Mínimo 6 caracteres.</span>
+        </div>
+
+        <div class="actions">
+          <ion-button type="submit" expand="block" [disabled]="form.invalid || isLoading">
+            <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
+            <span *ngIf="!isLoading">Registrar Negocio</span>
+          </ion-button>
+          
+          <div class="login-link">
+            ¿Ya tienes cuenta? <a routerLink="/login">Inicia Sesión</a>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</ion-content>

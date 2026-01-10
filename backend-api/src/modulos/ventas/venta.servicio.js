@@ -17,9 +17,9 @@ async function listarVentas(filtro = {}) {
   })
 }
 
-async function obtenerVentaPorId(id) {
-  return prisma.venta.findUnique({
-    where: { id },
+async function obtenerVentaPorId(id, negocioId) {
+  return prisma.venta.findFirst({
+    where: { id, negocioId },
     include: {
       detalles: {
         include: { producto: true }
@@ -49,7 +49,8 @@ async function crearVenta(payload) {
     estadoPago = 'PAGADO',
     montoPagado = 0,
     registrarCliente = false,
-    datosCliente = null
+    datosCliente = null,
+    negocioId
   } = payload
 
   if (!Array.isArray(items) || items.length === 0) {
@@ -63,6 +64,7 @@ async function crearVenta(payload) {
     if (registrarCliente && datosCliente) {
       const nuevoCliente = await tx.cliente.create({
         data: {
+          negocioId,
           nombre: datosCliente.nombre,
           telefono: datosCliente.telefono,
           cedula: datosCliente.cedula || null, // Convertir '' a null
@@ -77,13 +79,13 @@ async function crearVenta(payload) {
 
     // Validar crédito disponible si es venta fiada
     if (estadoPago === 'FIADO' && clienteIdFinal) {
-      const cliente = await tx.cliente.findUnique({ where: { id: clienteIdFinal } })
+      const cliente = await tx.cliente.findFirst({ where: { id: clienteIdFinal, negocioId } })
       if (!cliente) throw new Error('Cliente no encontrado')
 
       // Calcular total primero
       const productosIds = items.map(i => Number(i.productoId));
       const productos = await tx.producto.findMany({
-        where: { id: { in: productosIds } }
+        where: { id: { in: productosIds }, negocioId }
       })
       const mapa = new Map(productos.map(p => [p.id, p]))
       let totalCalculado = 0
@@ -105,7 +107,7 @@ async function crearVenta(payload) {
 
     // Obtener productos y validar stock
     const productos = await tx.producto.findMany({
-      where: { id: { in: items.map(i => Number(i.productoId)) } }
+      where: { id: { in: items.map(i => Number(i.productoId)) }, negocioId }
     })
     console.log('Productos recuperados BD:', JSON.stringify(productos, null, 2));
 
@@ -115,24 +117,15 @@ async function crearVenta(payload) {
     const detalles = items.map(i => {
       console.log('Procesando item:', i);
       const p = mapa.get(Number(i.productoId))
-      if (!p) throw new Error(`Producto con ID ${i.productoId} no existe`)
+      if (!p) throw new Error(`Producto con ID ${i.productoId} no existe o no pertenece al negocio`)
       
       console.log('Producto encontrado:', p);
 
-      // MODIFICACIÓN: Permitir stock negativo temporalmente para no bloquear ventas
-      // El usuario reportó esto como un bug, lo que implica que desea vender aunque no haya stock registrado.
-      // if (p.stock < Number(i.cantidad)) {
-      //   throw new Error(`Stock insuficiente para ${p.nombre}. Disponible: ${p.stock}, Solicitado: ${i.cantidad}`)
-      // }
-      
       const cantidad = Number(i.cantidad)
-      // Usar precioVenta en lugar de precio, asegurando que sea numérico
-      // Priorizar precioVenta, luego precioCosto, y finalmente 0. Asegurar conversión a Number.
       let precioRaw = p.precioVenta;
       if (precioRaw === null || precioRaw === undefined) {
           precioRaw = p.precio; // Fallback por si acaso
       }
-      console.log(`Precio raw para ${p.id}:`, precioRaw);
       
       const precioUnitario = Number(precioRaw || 0);
       
@@ -154,25 +147,12 @@ async function crearVenta(payload) {
     const montoPagadoFinal = estadoPago === 'PAGADO' ? total : Number(montoPagado || 0)
     const saldoPendiente = total - montoPagadoFinal
 
-    // Preparar data para creación de venta
-    // Asegurar que no haya NaNs
     const totalFinal = Number(total || 0);
     const montoPagadoValidado = Number(montoPagadoFinal || 0);
     const saldoPendienteValidado = Number(saldoPendiente || 0);
 
-    // FIX DEFINITIVO:
-    // El modelo Venta tiene usuarioId Int (escalar) y usuario Usuario (relación).
-    // Prisma permite pasar el escalar directamente si se conoce, o usar connect.
-    // Mezclar connect y el escalar implícito puede causar confusión si no se hace bien.
-    // Lo más simple y robusto si ya tenemos el ID es pasar el ID escalar directamente,
-    // y NO usar el bloque `usuario: { connect: ... }` si no es estrictamente necesario.
-    // O si usamos connect, NO pasar el usuarioId escalar en el objeto principal.
-    
-    // Vamos a optar por pasar los IDs escalares directamente, que es lo que Prisma usa por debajo
-    // y suele ser menos propenso a errores de "missing argument" en relaciones nested complejas
-    // a menos que sea una creación anidada.
-    
     const ventaData = {
+      negocioId,
       total: totalFinal,
       metodoPago,
       estadoPago,
@@ -193,6 +173,7 @@ async function crearVenta(payload) {
     for (const d of detalles) {
       await tx.detalleVenta.create({
         data: {
+          negocioId,
           ventaId: venta.id,
           productoId: d.productoId,
           cantidad: d.cantidad,
@@ -209,13 +190,14 @@ async function crearVenta(payload) {
     // Si es venta fiada, crear la deuda
     if (estadoPago === 'FIADO' && clienteIdFinal) {
       // Calcular fecha de vencimiento
-      const clienteDeuda = await tx.cliente.findUnique({ where: { id: clienteIdFinal } })
+      const clienteDeuda = await tx.cliente.findFirst({ where: { id: clienteIdFinal, negocioId } })
       const dias = clienteDeuda.diasCredito || 30
       const fechaVencimiento = new Date()
       fechaVencimiento.setDate(fechaVencimiento.getDate() + dias)
 
       await tx.deuda.create({
         data: {
+          negocioId,
           clienteId: clienteIdFinal,
           ventaId: venta.id,
           montoTotal: saldoPendiente,
@@ -252,7 +234,7 @@ async function crearVenta(payload) {
     // Registrar cualquier venta en la caja abierta del usuario, independientemente del método de pago
     if (montoPagadoValidado > 0) {
       const cajaAbierta = await tx.caja.findFirst({
-        where: { usuarioId: Number(usuarioId), estado: 'ABIERTA' }
+        where: { usuarioId: Number(usuarioId), negocioId, estado: 'ABIERTA' }
       })
 
       console.log(`[Caja Integration] Caja abierta encontrada:`, cajaAbierta ? cajaAbierta.id : 'NO');
@@ -261,6 +243,7 @@ async function crearVenta(payload) {
         const metodoPagoNorm = String(metodoPago).toUpperCase(); // Normalizar a mayúsculas (EFECTIVO, TRANSFERENCIA)
         const mov = await tx.movimientoCaja.create({
           data: {
+            negocioId,
             cajaId: cajaAbierta.id,
             usuarioId: Number(usuarioId),
             tipo: 'VENTA',
@@ -286,7 +269,7 @@ async function crearVenta(payload) {
 
   // Una vez confirmada la transacción, obtener la venta completa
   console.log(`Transacción completada. Recuperando venta ID: ${ventaId}`);
-  const ventaCompleta = await obtenerVentaPorId(ventaId);
+  const ventaCompleta = await obtenerVentaPorId(ventaId, negocioId);
   
   if (!ventaCompleta) {
     console.error(`ERROR CRÍTICO: No se pudo recuperar la venta ${ventaId} después de la transacción.`);

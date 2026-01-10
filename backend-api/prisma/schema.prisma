@@ -4,17 +4,19 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Usuario {
   id              Int              @id @default(autoincrement())
   nombre          String
   correo          String           @unique
-  passwordHash    String
+  passwordHash    String?          // Made optional as per Phase 2
   activo          Boolean          @default(true)
   creadoEn        DateTime         @default(now())
   negocioId       Int?
+  authUserId      String?          @unique @db.Uuid // Linked to Supabase Auth
   adminPorDefecto Boolean          @default(false)
   logs            AuditLog[]
   pagosGastos     PagoGasto[]
@@ -30,14 +32,16 @@ model Usuario {
 model Caja {
   id            Int              @id @default(autoincrement())
   usuarioId     Int
+  negocioId     Int?
   usuario       Usuario          @relation(fields: [usuarioId], references: [id])
+  negocio       Negocio?         @relation(fields: [negocioId], references: [id])
   fechaApertura DateTime         @default(now())
   fechaCierre   DateTime?
   montoInicial  Float
-  montoFinal    Float?           // Monto real en caja al cierre
-  montoSistema  Float?           // Monto calculado por el sistema
-  diferencia    Float?           // Diferencia (montoFinal - montoSistema)
-  estado        String           @default("ABIERTA") // ABIERTA, CERRADA
+  montoFinal    Float?
+  montoSistema  Float?
+  diferencia    Float?
+  estado        String           @default("ABIERTA")
   observaciones String?
   movimientos   MovimientoCaja[]
 }
@@ -48,16 +52,17 @@ model MovimientoCaja {
   caja        Caja     @relation(fields: [cajaId], references: [id])
   usuarioId   Int
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])
-  tipo        String   // INGRESO, EGRESO, VENTA, PAGO_GASTO, ABONO_VENTA
-  metodoPago  String   @default("EFECTIVO") // EFECTIVO, TRANSFERENCIA, TARJETA, ETC.
+  negocioId   Int?
+  negocio     Negocio? @relation(fields: [negocioId], references: [id])
+  tipo        String
+  metodoPago  String   @default("EFECTIVO")
   monto       Float
   descripcion String?
   fecha       DateTime @default(now())
-  
-  // Relaciones opcionales para trazabilidad
-  ventaId     Int?
-  gastoId     Int?
-  abonoId     Int?
+
+  ventaId Int?
+  gastoId Int?
+  abonoId Int?
 }
 
 model Modulo {
@@ -82,6 +87,19 @@ model Negocio {
   creadoEn       DateTime        @default(now())
   modulos        NegocioModulo[]
   usuarios       Usuario[]
+
+  // Relaciones Multi-Tenant
+  productos       Producto[]
+  clientes        Cliente[]
+  ventas          Venta[]
+  cajas           Caja[]
+  movimientosCaja MovimientoCaja[]
+  gastos          Gasto[]
+  pagosGastos     PagoGasto[]
+  deudas          Deuda[]
+  abonos          Abono[]
+  auditLogs       AuditLog[]
+  detallesVenta   DetalleVenta[]
 }
 
 model NegocioModulo {
@@ -105,6 +123,8 @@ model UsuarioModulo {
 
 model Producto {
   id                 Int                  @id @default(autoincrement())
+  negocioId          Int?
+  negocio            Negocio?             @relation(fields: [negocioId], references: [id])
   tipo               String               @default("GENERAL")
   nombre             String
   sku                String?              @unique
@@ -205,6 +225,8 @@ model ProductoRestaurante {
 
 model Cliente {
   id            Int      @id @default(autoincrement())
+  negocioId     Int?
+  negocio       Negocio? @relation(fields: [negocioId], references: [id])
   nombre        String
   correo        String?  @unique
   telefono      String?
@@ -224,6 +246,8 @@ model Cliente {
 
 model Venta {
   id             Int            @id @default(autoincrement())
+  negocioId      Int?
+  negocio        Negocio?       @relation(fields: [negocioId], references: [id])
   fecha          DateTime       @default(now())
   total          Float
   clienteId      Int?
@@ -285,6 +309,8 @@ model UsuarioPermiso {
 
 model DetalleVenta {
   id             Int      @id @default(autoincrement())
+  negocioId      Int?
+  negocio        Negocio? @relation(fields: [negocioId], references: [id])
   ventaId        Int
   productoId     Int
   cantidad       Int
@@ -296,6 +322,8 @@ model DetalleVenta {
 
 model AuditLog {
   id        Int      @id @default(autoincrement())
+  negocioId Int?
+  negocio   Negocio? @relation(fields: [negocioId], references: [id])
   usuarioId Int?
   accion    String
   detalle   String?
@@ -305,6 +333,8 @@ model AuditLog {
 
 model Deuda {
   id               Int       @id @default(autoincrement())
+  negocioId        Int?
+  negocio          Negocio?  @relation(fields: [negocioId], references: [id])
   clienteId        Int
   ventaId          Int       @unique
   montoTotal       Float
@@ -319,6 +349,8 @@ model Deuda {
 
 model Abono {
   id         Int      @id @default(autoincrement())
+  negocioId  Int?
+  negocio    Negocio? @relation(fields: [negocioId], references: [id])
   deudaId    Int
   clienteId  Int
   monto      Float
@@ -332,6 +364,8 @@ model Abono {
 
 model Gasto {
   id               Int         @id @default(autoincrement())
+  negocioId        Int?
+  negocio          Negocio?    @relation(fields: [negocioId], references: [id])
   proveedor        String
   concepto         String
   montoTotal       Float
@@ -345,6 +379,8 @@ model Gasto {
 
 model PagoGasto {
   id         Int      @id @default(autoincrement())
+  negocioId  Int?
+  negocio    Negocio? @relation(fields: [negocioId], references: [id])
   gastoId    Int
   monto      Float
   fecha      DateTime @default(now())

@@ -11,14 +11,16 @@ const {
 async function registrarRutasCliente(app) {
   // Listar todos los clientes
   app.get('/clientes', { preHandler: [app.requiereModulo('clientes'), app.requierePermiso('VER_CLIENTES')] }, async (req, res) => {
-    const datos = await listarClientes()
+    const negocioId = req.user.negocioId
+    const datos = await listarClientes({ negocioId })
     return res.send(datos)
   })
 
   // Obtener un cliente por ID
   app.get('/clientes/:id', { preHandler: [app.requiereModulo('clientes'), app.requierePermiso('VER_CLIENTES')] }, async (req, res) => {
     const id = Number(req.params.id)
-    const dato = await obtenerClientePorId(id)
+    const negocioId = req.user.negocioId
+    const dato = await obtenerClientePorId(id, negocioId)
     if (!dato) {
       res.code(404)
       return { mensaje: 'No encontrado' }
@@ -29,8 +31,9 @@ async function registrarRutasCliente(app) {
   // Obtener estado de cuenta de un cliente (deudas, abonos, crédito disponible)
   app.get('/clientes/:id/estado-cuenta', { preHandler: [app.requiereModulo('clientes'), app.requierePermiso('VER_CLIENTES')] }, async (req, res) => {
     const id = Number(req.params.id)
+    const negocioId = req.user.negocioId
     try {
-      const estadoCuenta = await obtenerEstadoCuentaCliente(id)
+      const estadoCuenta = await obtenerEstadoCuentaCliente(id, negocioId)
       return estadoCuenta
     } catch (error) {
       res.code(404)
@@ -42,6 +45,7 @@ async function registrarRutasCliente(app) {
   app.post('/clientes/:id/validar-credito', { preHandler: [app.requiereModulo('clientes'), app.requierePermiso('VER_CLIENTES')] }, async (req, res) => {
     const clienteId = Number(req.params.id)
     const { monto } = req.body
+    const negocioId = req.user.negocioId
 
     if (!monto || monto <= 0) {
       res.code(400)
@@ -49,7 +53,7 @@ async function registrarRutasCliente(app) {
     }
 
     try {
-      const validacion = await validarCreditoDisponible(clienteId, Number(monto))
+      const validacion = await validarCreditoDisponible(clienteId, Number(monto), negocioId)
       return validacion
     } catch (error) {
       res.code(404)
@@ -60,8 +64,9 @@ async function registrarRutasCliente(app) {
   // Crear un nuevo cliente
   app.post('/clientes', { preHandler: [app.requiereModulo('clientes'), app.requierePermiso('CREAR_CLIENTE')] }, async (req, res) => {
     const cuerpo = req.body
+    const negocioId = req.user.negocioId
     try {
-      const creado = await crearCliente(cuerpo)
+      const creado = await crearCliente(cuerpo, negocioId)
       res.code(201)
       return creado
     } catch (error) {
@@ -75,15 +80,17 @@ async function registrarRutasCliente(app) {
   app.put('/clientes/:id', { preHandler: [app.requiereModulo('clientes'), app.requierePermiso('EDITAR_CLIENTE')] }, async (req, res) => {
     const id = Number(req.params.id)
     const cuerpo = req.body
-    const actualizado = await actualizarCliente(id, cuerpo)
+    const negocioId = req.user.negocioId
+    const actualizado = await actualizarCliente(id, cuerpo, negocioId)
     return actualizado
   })
 
   // Eliminar un cliente
   app.delete('/clientes/:id', { preHandler: [app.requiereModulo('clientes'), app.requierePermiso('ELIMINAR_CLIENTE')] }, async (req, res) => {
     const id = Number(req.params.id)
+    const negocioId = req.user.negocioId
     try {
-      const eliminado = await eliminarCliente(id)
+      const eliminado = await eliminarCliente(id, negocioId)
       return eliminado
     } catch (error) {
       res.code(400)
