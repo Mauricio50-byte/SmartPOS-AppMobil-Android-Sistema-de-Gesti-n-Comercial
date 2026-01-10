@@ -15,10 +15,7 @@ model Usuario {
   activo          Boolean          @default(true)
   creadoEn        DateTime         @default(now())
   negocioId       Int?
-  accessMethod    String           @default("STANDARD")
   adminPorDefecto Boolean          @default(false)
-  loginToken      String?          @unique
-  loginTokenExp   DateTime?
   logs            AuditLog[]
   pagosGastos     PagoGasto[]
   negocio         Negocio?         @relation(fields: [negocioId], references: [id])
