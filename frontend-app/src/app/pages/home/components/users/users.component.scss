@@ -325,3 +325,65 @@
     letter-spacing: 0.05em;
   }
 }
+
+// Skeleton Loading
+.skeleton-card {
+  pointer-events: none;
+  
+  .skeleton {
+    background: #f3f4f6;
+    background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+  }
+
+  .skeleton-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+  }
+
+  .skeleton-badge {
+    width: 80px;
+    height: 24px;
+    border-radius: 20px;
+
+    &.small {
+      width: 60px;
+      height: 20px;
+      border-radius: 6px;
+    }
+  }
+
+  .skeleton-text {
+    height: 16px;
+    margin-bottom: 8px;
+
+    &.title {
+      width: 70%;
+      height: 20px;
+      margin-bottom: 12px;
+    }
+
+    &.subtitle {
+      width: 50%;
+      margin-bottom: 16px;
+    }
+  }
+
+  .skeleton-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

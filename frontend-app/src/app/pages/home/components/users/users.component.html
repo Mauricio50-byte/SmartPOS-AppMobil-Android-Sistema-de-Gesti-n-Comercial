@@ -10,8 +10,31 @@
     </ion-button>
   </div>
 
+  <!-- Loading State (Skeleton) -->
+  <div *ngIf="isLoading" class="usuarios-grid">
+    <div class="usuario-card skeleton-card" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="card-header">
+        <div class="skeleton-avatar skeleton"></div>
+        <div class="skeleton-badge skeleton"></div>
+      </div>
+      <div class="card-body">
+        <div class="skeleton-text title skeleton"></div>
+        <div class="skeleton-text subtitle skeleton"></div>
+        <div class="roles-container">
+          <div class="skeleton-badge small skeleton"></div>
+          <div class="skeleton-badge small skeleton"></div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="skeleton-icon skeleton"></div>
+        <div class="skeleton-icon skeleton"></div>
+        <div class="skeleton-icon skeleton"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Lista de usuarios -->
-  <div class="usuarios-grid">
+  <div class="usuarios-grid" *ngIf="!isLoading">
     <div *ngFor="let usuario of usuarios" class="usuario-card">
       <div class="card-header">
         <div class="usuario-avatar" [class.admin]="usuario.roles && usuario.roles.includes('ADMIN')" [class.trabajador]="usuario.roles && usuario.roles.includes('TRABAJADOR')">
