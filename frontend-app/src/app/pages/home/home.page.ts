@@ -6,7 +6,6 @@ import { NotificationService, AppNotification } from '../../core/services/notifi
 import { Observable } from 'rxjs';
 
 import { ModalController, PopoverController } from '@ionic/angular';
-import { ConexionQrComponent } from '../../shared/components/conexion-qr/conexion-qr.component';
 
 export type HomeView = 'dashboard' | 'users' | 'ventas' | 'productos' | 'modulos' | 'finanzas' | 'clientes' | 'reportes' | 'configuracion';
 
