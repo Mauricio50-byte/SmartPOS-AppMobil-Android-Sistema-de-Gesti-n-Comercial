@@ -121,7 +121,7 @@
   </div>
 
   <!-- Modules Tab -->
-  <div *ngIf="(actorAdminPorDefecto || actorEsAdmin) && usuario" [hidden]="activeTab !== 'modulos'" class="permisos-section">
+  <div *ngIf="actorEsAdmin && usuario" [hidden]="activeTab !== 'modulos'" class="permisos-section">
     <h4>Módulos Activos</h4>
     <p class="helper-text">Habilite los módulos operativos a los que este usuario tendrá acceso.</p>
 
@@ -202,7 +202,7 @@
       <ion-button (click)="dismiss()" color="medium" fill="clear">
         Cancelar
       </ion-button>
-      <ion-button *ngIf="actorAdminPorDefecto || actorEsAdmin" 
+      <ion-button *ngIf="actorEsAdmin" 
                   color="primary" 
                   fill="solid" 
                   shape="round"

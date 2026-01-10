@@ -24,18 +24,49 @@ async function registrarRutasAuth(app) {
     await limpiarUsuarioHuérfano(email);
 
     try {
-      const { user, session } = await registrar({ email, password, options })
+      const { user, session, usuarioPrisma } = await registrar({ email, password, options })
 
       // Si hay sesión (login automático), devolver token
-      if (session) {
-        // Necesitamos esperar a que el trigger cree el usuario en Prisma para devolver el perfil completo?
-        // Por ahora devolvemos el token de Supabase y el usuario básico.
+      if (session && usuarioPrisma) {
+        // Construct user profile similar to 'ingresar'
+        const roles = usuarioPrisma.roles.map(ur => ur.rol.nombre)
+        const permisosDirectos = usuarioPrisma.permisos.map(up => up.permiso.clave)
+        const permisos = Array.from(new Set([...permisosDirectos]))
+        const negocioId = usuarioPrisma.negocioId ?? null
+        
+        let modulos = []
+        if (negocioId) {
+          const activos = await obtenerModulosActivosNegocio(negocioId)
+          if (roles.includes('ADMIN')) {
+            modulos = activos
+          } else {
+            const asignados = Array.isArray(usuarioPrisma.modulos) ? usuarioPrisma.modulos.map(m => m.moduloId) : []
+            modulos = asignados.filter(m => activos.includes(m))
+          }
+        }
+
+        // SIEMPRE firmamos nuestro propio token para compatibilidad con la API del Backend
+        const token = await res.jwtSign({ 
+            id: usuarioPrisma.id, 
+            roles, 
+            permisos, 
+            nombre: usuarioPrisma.nombre, 
+            correo: usuarioPrisma.correo, 
+            negocioId, 
+            modulos 
+        })
+
         return {
-          token: session.access_token,
+          token, // Token backend (JWT Fastify)
+          session, // Session Supabase
           usuario: {
-            id: user.id, // Supabase ID, frontend debe manejar esto
-            email: user.email,
-            // Perfil incompleto hasta que se cree en DB
+            id: usuarioPrisma.id,
+            nombre: usuarioPrisma.nombre,
+            correo: usuarioPrisma.correo,
+            roles,
+            permisos,
+            negocioId,
+            modulos
           }
         }
       }

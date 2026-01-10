@@ -72,7 +72,7 @@ async function registrar({ email, password, options }) {
 
   if (loginError) throw new Error(loginError.message)
 
-  return { user: userDat.user, session: sessionData.session }
+  return { user: userDat.user, session: sessionData.session, usuarioPrisma: usuario }
 }
 
 async function crearAdministrador({ nombre, correo, password }) {
