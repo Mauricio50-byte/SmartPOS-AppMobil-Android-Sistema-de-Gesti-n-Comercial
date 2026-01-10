@@ -50,7 +50,12 @@
 
       <div class="actions">
         <ion-button type="submit" expand="block" [disabled]="form.invalid">Iniciar Sesión</ion-button>
-        <a class="forgot" href="#" aria-label="Recuperar contraseña">¿Olvidaste tu contraseña?</a>
+        <div class="links">
+          <a class="forgot" href="#" aria-label="Recuperar contraseña">¿Olvidaste tu contraseña?</a>
+          <div class="register-prompt">
+            ¿Eres dueño de negocio? <a routerLink="/register">Regístrate aquí</a>
+          </div>
+        </div>
       </div>
 
       <div class="offline" *ngIf="(online$ | async) === false" role="status">

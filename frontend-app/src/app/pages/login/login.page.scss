@@ -101,10 +101,31 @@ ion-content.login-wrapper {
     font-weight: 600;
 }
 
+.links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    margin-top: 8px;
+}
+
 .forgot {
     text-align: center;
     text-decoration: none;
     color: var(--ion-color-medium);
+    font-size: 14px;
+}
+
+.register-prompt {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    
+    a {
+        color: var(--brand-teal);
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
 }
 
 .offline {
