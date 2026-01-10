@@ -15,6 +15,7 @@ export class ProductosComponent implements OnInit {
   products: Producto[] = [];
   selectedProduct: Producto | null = null;
   modulosActivos: Set<string> = new Set();
+  isLoading: boolean = false;
 
   constructor(
     private productoService: ProductosServices,
@@ -48,13 +49,16 @@ export class ProductosComponent implements OnInit {
   }
 
   loadProducts() {
+    this.isLoading = true;
     this.productoService.listarProductos().subscribe({
       next: (data) => {
         this.products = data;
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading products', err);
         this.mostrarToast('Error al cargar productos');
+        this.isLoading = false;
       }
     });
   }

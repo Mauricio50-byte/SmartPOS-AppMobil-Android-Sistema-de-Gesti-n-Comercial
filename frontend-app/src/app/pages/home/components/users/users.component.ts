@@ -19,6 +19,7 @@ export class UsersComponent implements OnInit {
   usuarioSeleccionado: Usuario | null = null;
   mostrarFormulario = false;
   isEditMode = false;
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -57,15 +58,18 @@ export class UsersComponent implements OnInit {
   }
 
   getUsuarios() {
+    this.isLoading = true;
     this.usuarioService.getUsuarios().subscribe({
       next: (usuarios: Usuario[]) => {
         this.usuarios = usuarios;
         console.log('Usuarios cargados:', this.usuarios);
+        this.isLoading = false;
       },
       error: (error: any) => {
         console.warn('No se pudieron cargar usuarios desde el backend:', error);
         this.mostrarAlerta('Error de Carga', 'No se pudieron cargar los usuarios. Verifique que el servidor esté activo y usted tenga permisos.' + (error.message || ''));
         this.usuarios = [];
+        this.isLoading = false;
       }
     });
   }

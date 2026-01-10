@@ -15,7 +15,17 @@
         </div>
       </div>
 
-      <div class="product-grid" *ngIf="filteredProductos.length > 0; else noProducts">
+      <div class="product-grid skeleton-grid" *ngIf="isLoading">
+        <ion-card *ngFor="let item of [1,2,3,4,5,6,7,8,9]" class="product-card-skeleton" style="margin: 0; box-shadow: none; border: 1px solid #eee;">
+          <ion-skeleton-text animated style="width: 100%; height: 120px;"></ion-skeleton-text>
+          <ion-card-header>
+            <ion-skeleton-text animated style="width: 80%; height: 20px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%; height: 16px;"></ion-skeleton-text>
+          </ion-card-header>
+        </ion-card>
+      </div>
+
+      <div class="product-grid" *ngIf="!isLoading && filteredProductos.length > 0">
         <app-product-card 
           *ngFor="let product of filteredProductos" 
           [product]="product" 
@@ -23,12 +33,10 @@
         </app-product-card>
       </div>
 
-      <ng-template #noProducts>
-        <div class="empty-state">
+      <div class="empty-state" *ngIf="!isLoading && filteredProductos.length === 0">
           <ion-icon name="search-outline"></ion-icon>
           <p>No se encontraron productos.</p>
-        </div>
-      </ng-template>
+      </div>
     </div>
 
     <!-- Panel de Ticket/Carrito (Sidebar en Desktop, Overlay en Móvil) -->

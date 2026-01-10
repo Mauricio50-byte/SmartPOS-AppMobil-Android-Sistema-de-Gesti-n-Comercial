@@ -39,6 +39,8 @@ export class VentasComponent implements OnInit {
   
   // Vista móvil (catalogo o carrito)
   cartVisibleMobile: boolean = false;
+  
+  isLoading: boolean = false;
 
   // Usuario actual
   currentUserId: number = 1;
@@ -138,16 +140,19 @@ export class VentasComponent implements OnInit {
   }
 
   loadProducts() {
+    this.isLoading = true;
     this.productoService.listarProductos().subscribe({
       next: (data) => {
         this.allProductos = data || [];
         this.productos = this.allProductos;
         this.filteredProductos = this.allProductos;
         this.aplicarFiltroModulosEnProductos();
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error cargando productos', err);
         this.mostrarToast('Error al cargar productos', 'danger');
+        this.isLoading = false;
       }
     });
   }

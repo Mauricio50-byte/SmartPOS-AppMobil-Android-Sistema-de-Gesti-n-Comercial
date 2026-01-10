@@ -12,7 +12,39 @@
 
     <div class="products-content">
         <div *ngIf="segment === 'info'" class="info-view fade-in">
+            
+            <!-- Skeleton Loading -->
+            <div *ngIf="isLoading" class="skeleton-wrapper">
+                <div class="filters-skeleton" style="display: flex; gap: 10px; padding: 10px;">
+                    <ion-skeleton-text animated style="width: 70%; height: 40px; border-radius: 8px;"></ion-skeleton-text>
+                    <ion-skeleton-text animated style="width: 30%; height: 40px; border-radius: 8px;"></ion-skeleton-text>
+                </div>
+                <div class="table-skeleton" style="padding: 10px;">
+                    <div class="header-skeleton" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                    </div>
+                    <ion-list>
+                        <ion-item *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]" lines="none" style="--padding-start: 0; --inner-padding-end: 0;">
+                            <ion-label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                                    <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                                    <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                                    <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                                    <ion-skeleton-text animated style="width: 20%; height: 20px;"></ion-skeleton-text>
+                                </div>
+                            </ion-label>
+                        </ion-item>
+                    </ion-list>
+                </div>
+            </div>
+
             <app-productos-lista 
+                *ngIf="!isLoading"
                 [products]="products" 
                 [modulosActivos]="modulosActivos"
                 (edit)="onEdit($event)" 

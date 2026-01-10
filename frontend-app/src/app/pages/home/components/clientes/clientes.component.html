@@ -63,7 +63,33 @@
   </div>
 
   <ng-template #loadingTpl>
-    <div class="loading"><ion-spinner name="dots" color="primary"></ion-spinner></div>
+    <div class="skeleton-container" style="padding: 20px;">
+        <div class="table-header-skeleton" style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <ion-skeleton-text animated style="width: 20%; height: 24px; border-radius: 4px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 15%; height: 24px; border-radius: 4px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 15%; height: 24px; border-radius: 4px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 15%; height: 24px; border-radius: 4px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 15%; height: 24px; border-radius: 4px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 10%; height: 24px; border-radius: 4px;"></ion-skeleton-text>
+        </div>
+        <ion-list>
+            <ion-item *ngFor="let i of [1,2,3,4,5,6,7,8]" lines="none" style="--padding-start: 0; --inner-padding-end: 0; margin-bottom: 10px;">
+                <ion-label>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="width: 20%; display: flex; align-items: center; gap: 10px;">
+                            <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 50%;"></ion-skeleton-text>
+                            <ion-skeleton-text animated style="width: 60%; height: 20px;"></ion-skeleton-text>
+                        </div>
+                        <ion-skeleton-text animated style="width: 15%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 15%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 15%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 15%; height: 20px;"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 10%; height: 20px; border-radius: 10px;"></ion-skeleton-text>
+                    </div>
+                </ion-label>
+            </ion-item>
+        </ion-list>
+    </div>
   </ng-template>
 
   <div class="detalle-panel" *ngIf="seleccionado">

@@ -73,7 +73,7 @@
   </div>
 
   <!-- Estado vacío -->
-  <div *ngIf="usuarios.length === 0" class="empty-state">
+  <div *ngIf="!isLoading && usuarios.length === 0" class="empty-state">
     <div class="empty-icon">
       <ion-icon name="people-outline"></ion-icon>
     </div>

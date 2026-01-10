@@ -43,6 +43,7 @@ export class ProductosListaComponent implements OnChanges, OnInit {
     { key: 'precioVenta', label: 'Precio', type: 'currency' },
     { key: 'stock', label: 'Stock', type: 'text' },
     { key: 'unidadMedida', label: 'Unidad', type: 'text' },
+    { key: 'proveedor', label: 'Proveedor', type: 'text' },
     { 
       key: 'activo', 
       label: 'Estado', 
@@ -165,7 +166,8 @@ export class ProductosListaComponent implements OnChanges, OnInit {
       const term = this.searchTerm.toLowerCase();
       temp = temp.filter(p =>
         p.nombre.toLowerCase().includes(term) ||
-        (p.sku && p.sku.toLowerCase().includes(term))
+        (p.sku && p.sku.toLowerCase().includes(term)) ||
+        (p.proveedor && p.proveedor.toLowerCase().includes(term))
       );
     }
 
