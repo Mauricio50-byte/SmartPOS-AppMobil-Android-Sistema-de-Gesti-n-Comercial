@@ -19,6 +19,108 @@ async function listarUsuarios(filtro = {}) {
   return usuarios.map(u => ({ ...u, roles: u.roles.map(r => r.rol.nombre) }))
 }
 
+async function obtenerUsuarioPorId(id) {
+  const usuario = await prisma.usuario.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      nombre: true,
+      correo: true,
+      activo: true,
+      creadoEn: true,
+      negocioId: true,
+      roles: { select: { rol: { select: { nombre: true, permisos: { select: { permiso: { select: { clave: true } } } } } } } },
+      permisos: { select: { permiso: { select: { clave: true } } } },
+      modulos: { select: { moduloId: true } }
+    }
+  })
+  if (usuario) {
+    const rolesNombres = usuario.roles.map(r => r.rol.nombre)
+    // Flatten permissions from roles
+    const permisosRoles = usuario.roles.flatMap(r => r.rol.permisos.map(p => p.permiso.clave))
+    // Flatten direct permissions
+    const permisosDirectos = usuario.permisos.map(p => p.permiso.clave)
+    
+    usuario.roles = rolesNombres
+    usuario.permisos = [...new Set([...permisosRoles, ...permisosDirectos])]
+    usuario.permisosDirectos = permisosDirectos // To distinguish in frontend if needed
+    usuario.modulos = Array.isArray(usuario.modulos) ? usuario.modulos.map(m => m.moduloId) : []
+  }
+  return usuario
+}
+
+async function actualizarUsuario(id, datos) {
+  const campos = {}
+  if (typeof datos.nombre === 'string') campos.nombre = datos.nombre
+  if (typeof datos.correo === 'string') campos.correo = datos.correo
+  if (typeof datos.activo === 'boolean') campos.activo = datos.activo
+  const usuario = await prisma.usuario.update({
+    where: { id },
+    data: campos,
+    select: {
+      id: true,
+      nombre: true,
+      correo: true,
+      activo: true,
+      roles: { select: { rol: { select: { nombre: true } } } }
+    }
+  })
+  usuario.roles = usuario.roles.map(r => r.rol.nombre)
+  return usuario
+}
+
+async function cambiarPassword(id, nueva) {
+  const passwordHash = await bcrypt.hash(nueva, 10)
+  await prisma.usuario.update({ where: { id }, data: { passwordHash } })
+  return { id }
+}
+
+async function activarUsuario(id) {
+  return prisma.usuario.update({ where: { id }, data: { activo: true }, select: { id: true, activo: true } })
+}
+
+async function desactivarUsuario(id) {
+  const usuario = await prisma.usuario.findUnique({ where: { id } })
+  if (usuario && usuario.correo === ADMIN_CORREO) {
+    throw new Error('No se puede desactivar el usuario administrador principal')
+  }
+  return prisma.usuario.update({ where: { id }, data: { activo: false }, select: { id: true, activo: true } })
+}
+
+async function eliminarUsuario(id) {
+  const usuario = await prisma.usuario.findUnique({ where: { id } })
+  if (!usuario) {
+    throw new Error('Usuario no encontrado')
+  }
+  if (usuario.correo === ADMIN_CORREO) {
+    throw new Error('No se puede eliminar el usuario administrador principal')
+  }
+
+  // Verificar si tiene ventas (Restricción de FK)
+  const ventas = await prisma.venta.count({ where: { usuarioId: id } })
+  if (ventas > 0) {
+    throw new Error('No se puede eliminar el usuario porque tiene ventas asociadas. Considere desactivarlo.')
+  }
+
+  // Eliminar dependencias antes de eliminar el usuario
+  const [_, __, usuarioEliminado] = await prisma.$transaction([
+    prisma.usuarioRol.deleteMany({ where: { usuarioId: id } }),
+    prisma.usuarioPermiso.deleteMany({ where: { usuarioId: id } }),
+    prisma.usuario.delete({ where: { id } })
+  ])
+  
+  return usuarioEliminado
+}
+
+async function asignarRolesAUsuario(id, roles = []) {
+  await prisma.usuarioRol.deleteMany({ where: { usuarioId: id } })
+  if (Array.isArray(roles) && roles.length) {
+    const rolesDb = await prisma.rol.findMany({ where: { nombre: { in: roles } } })
+    for (const r of rolesDb) await prisma.usuarioRol.create({ data: { usuarioId: id, rolId: r.id } })
+  }
+  return { id }
+}
+
 // ... (other functions remain same until crearUsuario)
 
 async function crearUsuario(datos) {

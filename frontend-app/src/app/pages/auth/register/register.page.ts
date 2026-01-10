@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 
@@ -66,7 +66,7 @@ export class RegisterPage implements OnInit {
         await toast.present();
         this.router.navigate(['/home']);
       },
-      error: async (err) => {
+      error: async (err: any) => {
         this.isLoading = false;
         console.error('Registration error:', err);
         const toast = await this.toastController.create({
