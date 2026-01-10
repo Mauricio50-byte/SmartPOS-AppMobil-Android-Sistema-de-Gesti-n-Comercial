@@ -2,13 +2,9 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-const hostname = window.location.hostname;
-const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-const apiUrl = isLocalhost ? 'http://localhost:3000' : `http://${hostname}:3000`;
-
 export const environment = {
   production: false,
-  apiUrl: apiUrl,
+  apiUrl: 'https://smartpos-appmobil-android-sistema-de.onrender.com',
 };
 
 /*
