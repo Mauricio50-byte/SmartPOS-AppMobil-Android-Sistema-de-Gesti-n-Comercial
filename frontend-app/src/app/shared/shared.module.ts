@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { ProductCardComponent } from './components/product-card/product-card.component';
 import { CartItemComponent } from './components/cart-item/cart-item.component';
 import { PaymentSelectorComponent } from './components/payment-selector/payment-selector.component';
-import { ConexionQrComponent } from './components/conexion-qr/conexion-qr.component';
 import { PermissionsModalComponent } from './components/permissions-modal/permissions-modal.component';
 
 @NgModule({
@@ -14,7 +13,6 @@ import { PermissionsModalComponent } from './components/permissions-modal/permis
         ProductCardComponent,
         CartItemComponent,
         PaymentSelectorComponent,
-        ConexionQrComponent,
         PermissionsModalComponent
     ],
     imports: [
@@ -26,7 +24,6 @@ import { PermissionsModalComponent } from './components/permissions-modal/permis
         ProductCardComponent,
         CartItemComponent,
         PaymentSelectorComponent,
-        ConexionQrComponent,
         PermissionsModalComponent,
         CommonModule,
         IonicModule,

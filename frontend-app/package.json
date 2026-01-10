@@ -36,7 +36,6 @@
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.2",
     "ng2-charts": "^8.0.0",
-    "qrcode": "^1.5.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz",

@@ -35,14 +35,6 @@ export class HomePage implements OnInit {
     this.unreadCount$ = this.notificationService.unreadCount$;
   }
 
-  async conectarDispositivo() {
-    const modal = await this.modalCtrl.create({
-      component: ConexionQrComponent,
-      cssClass: 'qr-modal'
-    });
-    return await modal.present();
-  }
-
   ngOnInit() {
     this.authService.getPerfil$().subscribe(user => {
       this.currentUser = user;

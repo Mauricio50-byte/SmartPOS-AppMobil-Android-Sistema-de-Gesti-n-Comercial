@@ -45,17 +45,6 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  // Nuevo método para login con token directo (QR)
-  loginWithToken(token: string): Observable<UsuarioPerfil> {
-    this.setToken(token);
-    // Verificar que el token sea válido y obtener datos del usuario
-    return this.fetchPerfil().pipe(
-      tap((usuario) => {
-        this.perfil$.next(usuario);
-      })
-    );
-  }
-
   fetchPerfil(): Observable<UsuarioPerfil> {
     return this.http.get<{ usuario: UsuarioPerfil }>(`${environment.apiUrl}/auth/perfil`).pipe(
       tap(({ usuario }) => this.perfil$.next(usuario)),

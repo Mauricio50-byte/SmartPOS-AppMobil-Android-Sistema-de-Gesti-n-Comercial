@@ -76,10 +76,7 @@
         </ion-buttons>
         <ion-title>{{ pageTitle }}</ion-title>
         <ion-buttons slot="end">
-          <!-- Botón de conexión QR -->
-          <ion-button class="header-action-btn desktop-only" *ngIf="hasPermission('ADMIN')" aria-label="Conectar Dispositivo" (click)="conectarDispositivo()">
-            <ion-icon name="qr-code-outline"></ion-icon>
-          </ion-button>
+
 
           <ion-button id="notifications-trigger" aria-label="Notificaciones" class="notification-btn">
             <ion-icon name="notifications-outline"></ion-icon>
