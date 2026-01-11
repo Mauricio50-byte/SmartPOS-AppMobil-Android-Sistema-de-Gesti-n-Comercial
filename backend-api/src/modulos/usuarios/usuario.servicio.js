@@ -126,6 +126,9 @@ async function asignarRolesAUsuario(id, roles = []) {
 }
 
 async function crearUsuario(datos, adminId = null) {
+  // 1. Limpiar usuario huérfano si existe en Auth pero no en DB (para evitar "email already registered")
+  await require('../auth/auth.servicio').limpiarUsuarioHuérfano(datos.correo);
+
   // 1. Create user in Supabase Auth
   // This triggers 'handle_new_user' in Postgres which creates the 'Usuario' record
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -168,6 +171,7 @@ async function crearUsuario(datos, adminId = null) {
     })
 
     if (rol && !roleExists) {
+      await prisma.usuarioRol.deleteMany({ where: { usuarioId: usuario.id } }) // Remove default role
       await prisma.usuarioRol.create({
         data: { usuarioId: usuario.id, rolId: rol.id }
       })
