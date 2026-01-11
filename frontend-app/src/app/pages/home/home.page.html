@@ -131,7 +131,7 @@
             <ng-container *ngIf="currentUser; else loadingTemplate">
               <div class="user-details">
                 <span class="user-name">{{ currentUser.nombre }}</span>
-                <span class="user-role">{{ currentUser.roles[0] || 'Usuario' }}</span>
+                <span class="user-role">{{ (currentUser.roles && currentUser.roles.length > 0) ? currentUser.roles[0] : 'Usuario' }}</span>
               </div>
               <div class="user-avatar">
                 <span>{{ currentUser.nombre.charAt(0).toUpperCase() }}</span>

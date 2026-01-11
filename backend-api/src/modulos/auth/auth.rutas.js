@@ -80,10 +80,10 @@ async function registrarRutasAuth(app) {
   app.post('/auth/ingresar', async (req, res) => {
     const { correo, password } = req.body || {}
     try {
-      const { usuario, roles, permisos, negocioId, modulos, adminPorDefecto, session } = await ingresar({ correo, password })
+      const { usuario, roles, permisos, negocioId, modulos, session } = await ingresar({ correo, password })
 
       // SIEMPRE firmamos nuestro propio token para compatibilidad con la API del Backend
-      const token = await res.jwtSign({ id: usuario.id, roles, permisos, nombre: usuario.nombre, correo: usuario.correo, negocioId, modulos, adminPorDefecto })
+      const token = await res.jwtSign({ id: usuario.id, roles, permisos, nombre: usuario.nombre, correo: usuario.correo, negocioId, modulos })
 
       return {
         token,
@@ -95,8 +95,7 @@ async function registrarRutasAuth(app) {
           nombre: usuario.nombre,
           correo: usuario.correo,
           negocioId,
-          modulos,
-          adminPorDefecto
+          modulos
         }
       }
     } catch (e) {
@@ -113,8 +112,8 @@ async function registrarRutasAuth(app) {
     if (totalAdmins > 0) {
       await req.jwtVerify()
       const roles = req.user?.roles || []
-      const adminPorDefecto = req.user?.adminPorDefecto === true
-      if (!(roles.includes('ADMIN') && adminPorDefecto)) { res.code(403); throw new Error('No autorizado') }
+      // Eliminamos validación de adminPorDefecto porque ya no existe esa columna
+      if (!roles.includes('ADMIN')) { res.code(403); throw new Error('No autorizado') }
     }
     const { nombre, correo, password } = req.body || {}
 

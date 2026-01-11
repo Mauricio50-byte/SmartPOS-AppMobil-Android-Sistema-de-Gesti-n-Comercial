@@ -18,8 +18,24 @@ async function registrar({ email, password, options }) {
   // Polling to wait for Trigger to create the User in Prisma
   let usuario = null;
   const authUserId = userDat.user.id;
-  for (let i = 0; i < 10; i++) { // Wait up to 5 seconds (10 * 500ms)
-    usuario = await prisma.usuario.findUnique({ where: { authUserId } })
+  // Aumentamos a 20 intentos de 500ms (10 segundos total) para dar tiempo al trigger en entornos lentos
+  for (let i = 0; i < 20; i++) { 
+    usuario = await prisma.usuario.findUnique({
+      where: { authUserId },
+      include: {
+        roles: {
+          include: {
+            rol: {
+              include: {
+                permisos: { include: { permiso: true } }
+              }
+            }
+          }
+        },
+        permisos: { include: { permiso: true } },
+        modulos: true
+      }
+    })
     if (usuario) break
     await new Promise(r => setTimeout(r, 500))
   }
@@ -34,33 +50,33 @@ async function registrar({ email, password, options }) {
     if (esAdmin && usuario.negocioId) {
       // 1. Activate all modules for the business if not already active
       const modulos = await prisma.modulo.findMany({ where: { activo: true } })
-      
+
       // Check if business has modules
       const negocioModulosCount = await prisma.negocioModulo.count({ where: { negocioId: usuario.negocioId } })
-      
+
       if (negocioModulosCount === 0) {
-         // Create NegocioModulo entries
-         await prisma.negocioModulo.createMany({
-            data: modulos.map(m => ({ negocioId: usuario.negocioId, moduloId: m.id, activo: true })),
-            skipDuplicates: true
-         })
+        // Create NegocioModulo entries
+        await prisma.negocioModulo.createMany({
+          data: modulos.map(m => ({ negocioId: usuario.negocioId, moduloId: m.id, activo: true })),
+          skipDuplicates: true
+        })
       }
 
       // 2. Assign all modules to the Admin user
       await prisma.usuarioModulo.createMany({
-         data: modulos.map(m => ({ usuarioId: usuario.id, moduloId: m.id })),
-         skipDuplicates: true
+        data: modulos.map(m => ({ usuarioId: usuario.id, moduloId: m.id })),
+        skipDuplicates: true
       })
     }
 
     // Log registration
     await prisma.auditLog.create({
-        data: {
-            usuarioId: usuario.id,
-            negocioId: usuario.negocioId,
-            accion: 'REGISTRO_NEGOCIO',
-            detalle: `Registro de nuevo negocio: ${options?.data?.business_name || 'Sin nombre'}`
-        }
+      data: {
+        usuarioId: usuario.id,
+        negocioId: usuario.negocioId,
+        accion: 'REGISTRO_NEGOCIO',
+        detalle: `Registro de nuevo negocio: ${options?.data?.business_name || 'Sin nombre'}`
+      }
     })
   }
 
@@ -143,12 +159,12 @@ async function ingresar({ correo, password }) {
 
   // Log Login
   await prisma.auditLog.create({
-      data: {
-          usuarioId: usuario.id,
-          negocioId: usuario.negocioId,
-          accion: 'LOGIN',
-          detalle: 'Inicio de sesión exitoso'
-      }
+    data: {
+      usuarioId: usuario.id,
+      negocioId: usuario.negocioId,
+      accion: 'LOGIN',
+      detalle: 'Inicio de sesión exitoso'
+    }
   })
 
   const roles = usuario.roles.map(ur => ur.rol.nombre)
